@@ -2,7 +2,7 @@
     SurveyGizmo
     -----------
 
-    Wrapper for SurveyGizmo's restful API service
+    A Python Wrapper for SurveyGizmo's restful API service
 
         >>> from surveygizmo import SurveyGizmo
         >>> sg = SurveyGizmo('v3')

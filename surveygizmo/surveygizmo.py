@@ -42,7 +42,7 @@ class _Config(object):
                 elif not self.password and not self.md5_hash:
                     raise ImproperlyConfigured()
             elif self.auth_method == "oauth":
-                if not self.oauth_consumer_key or not self.oauth_consumer_secret or
+                if not self.oauth_consumer_key or not self.oauth_consumer_secret or \
                    not self.oauth_token or not self.oauth_token_secret:
                     raise ImproperlyConfigured()
 
