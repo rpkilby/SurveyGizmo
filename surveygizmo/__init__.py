@@ -26,5 +26,5 @@ __copyright__ = 'Copyright 2013 Ryan P Kilby'
 __all__ = ['SurveyGizmo', 'ImproperlyConfigured', 'SGAuthService']
 
 
-from .oauth import SGAuthService
+from .oauth_helper import SGAuthService
 from .surveygizmo import SurveyGizmo, ImproperlyConfigured
