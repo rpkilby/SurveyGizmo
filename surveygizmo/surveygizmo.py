@@ -2,6 +2,7 @@
 import oauth_helper
 import requests
 import hashlib
+import importlib
 
 "https://restapi.surveygizmo.com/v1/survey/{$survey}/surveyresponse?user:pass={$user}:{$pass}{$status}{$datesubmmitted}"
 
@@ -13,7 +14,7 @@ class ImproperlyConfigured(Exception):
 
 class _Config(object):
     def __init__(self, **kwargs):
-        self.api_version = kwargs.get('api_version')
+        self.api_version = kwargs.get('api_version', 'head')
         self.auth_method = kwargs.get('auth_method', None)
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
@@ -28,23 +29,23 @@ class _Config(object):
         """ Perform validation check on properties.
         """
         if not self.api_version in ['v3', 'head']:
-            raise ImproperlyConfigured()
+            raise ImproperlyConfigured("No API version provided.")
 
         if not self.auth_method in ['user:pass', 'user:md5', 'oauth']:
-            raise ImproperlyConfigured()
+            raise ImproperlyConfigured("No authentication method provided.")
         else:
             if self.auth_method == "user:pass":
                 if not self.username or not self.password:
-                    raise ImproperlyConfigured()
+                    raise ImproperlyConfigured("Username and password for 'user:pass' authentication.")
             elif self.auth_method == "user:md5":
                 if not self.username:
-                    raise ImproperlyConfigured()
+                    raise ImproperlyConfigured("Username required for 'user:md5' authentication.")
                 elif not self.password and not self.md5_hash:
-                    raise ImproperlyConfigured()
+                    raise ImproperlyConfigured("Password or md5 hash of password required for 'user:md5' authentication.")
             elif self.auth_method == "oauth":
                 if not self.oauth_consumer_key or not self.oauth_consumer_secret or \
                    not self.oauth_token or not self.oauth_token_secret:
-                    raise ImproperlyConfigured()
+                    raise ImproperlyConfigured("OAuth consumer key and secret, and OAuth access token and secret required for 'oauth' authentication.")
 
         if not self.response_type in ["json", "pson", "xml", "debug", None]:
             raise ImproperlyConfigured()
@@ -68,7 +69,7 @@ class _API(object):
             self._api_version = self._sg.config.api_version
             self._api = importlib.import_module(".%s" % self._sg.config.api_version, 'surveygizmo.api')
 
-        if hasattr(self.other, name):
+        if hasattr(self._api, name):
             func = getattr(self._api, name)
             # return lambda *args, **kwargs: self._wrap(func, args, kwargs)
             return self._wrap(func)
@@ -84,9 +85,9 @@ class _API(object):
             # self._tail, self._params = func(*args, **kwargs)
             tail, params = func(*args, **kwargs)
 
-            return_type = self._sg.config.return_type
-            if return_type:
-                tail = "%s.%s" % (tail, return_type)
+            response_type = self._sg.config.response_type
+            if response_type:
+                tail = "%s.%s" % (tail, response_type)
             tail = "%s/%s" % (self._api_version, tail)
 
             return self.execute(tail, params)
@@ -114,7 +115,7 @@ class _API(object):
                 config.auth_method: "%s:%s" % (config.username, config.password),
             })
             url = "%s%s" % (self.base_url, tail)
-            response = requests.get(url, params)
+            response = requests.get(url, params=params)
 
         elif config.auth_method == 'user:md5':
             if not config.md5_hash:
@@ -123,7 +124,7 @@ class _API(object):
                 config.auth_method: "%s:%s" % (config.username, config.md5_hash),
             })
             url = "%s%s" % (self.base_url, tail)
-            response = requests.get(url, params)
+            response = requests.get(url, params=params)
 
         else:  # 'oauth'
             if not self._session:
@@ -145,6 +146,6 @@ class _API(object):
 
 
 class SurveyGizmo(object):
-    def __init__(self, api_version="head", **kwargs):
-        self.config = _Config(api_version, **kwargs)
+    def __init__(self, **kwargs):
+        self.config = _Config(**kwargs)
         self.api = _API(self)
