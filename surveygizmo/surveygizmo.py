@@ -2,9 +2,9 @@
 import oauth_helper
 import requests
 import hashlib
-import importlib
+import imp
 
-"https://restapi.surveygizmo.com/v1/survey/{$survey}/surveyresponse?user:pass={$user}:{$pass}{$status}{$datesubmmitted}"
+# "https://restapi.surveygizmo.com/v1/survey/{$survey}/surveyresponse?user:pass={$user}:{$pass}{$status}{$datesubmmitted}"
 
 
 class ImproperlyConfigured(Exception):
@@ -13,8 +13,9 @@ class ImproperlyConfigured(Exception):
 
 
 class _Config(object):
-    def __init__(self, **kwargs):
-        self.api_version = kwargs.get('api_version', 'head')
+    def __init__(self, _sg, **kwargs):
+        self._sg = _sg
+        self._api_version = kwargs.get('api_version', 'head')
         self.auth_method = kwargs.get('auth_method', None)
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
@@ -29,7 +30,7 @@ class _Config(object):
         """ Perform validation check on properties.
         """
         if not self.api_version in ['v3', 'head']:
-            raise ImproperlyConfigured("No API version provided.")
+            raise ImproperlyConfigured("API version provided is invalid.")
 
         if not self.auth_method in ['user:pass', 'user:md5', 'oauth']:
             raise ImproperlyConfigured("No authentication method provided.")
@@ -50,39 +51,62 @@ class _Config(object):
         if not self.response_type in ["json", "pson", "xml", "debug", None]:
             raise ImproperlyConfigured()
 
+    @property
+    def api_version(self):
+        return self._api_version
+
+    @api_version.setter
+    def api_version(self, value):
+        self._api_version = value
+        self._sg.api._check_version()
+
 
 class _API(object):
+    base_url = "https://restapi.surveygizmo.com/"
+    head = 'v3'
+
     def __init__(self, _sg):
         self._sg = _sg
         self._api_version = None
-        self._api = None
+        self._modules = None
         self._filters = {}
         self._session = None
-        self.base_url = "https://restapi.surveygizmo.com/"
 
-    def __getattr__(self, name):
-        """ Validate configuration, get api, get method.
+    def _check_version(self):
+        """ update api modules, wrap callables.
         """
-        self._sg.config.validate()
-
         if self._api_version != self._sg.config.api_version:
             self._api_version = self._sg.config.api_version
-            self._api = importlib.import_module(".%s" % self._sg.config.api_version, 'surveygizmo.api')
+            self._modules = {}
 
-        if hasattr(self._api, name):
-            func = getattr(self._api, name)
-            # return lambda *args, **kwargs: self._wrap(func, args, kwargs)
-            return self._wrap(func)
+            api_version = self.head if self._api_version == 'head' else self._api_version
+
+            module_list = getattr(__import__('api', globals(), locals(), [api_version]), api_version).__all__
+            search_path = 'surveygizmo/api/%s' % api_version
+
+            for module_name in module_list:
+                find_result = imp.find_module(module_name, [search_path])
+                module = imp.load_module("_api_loaded_%s" % module_name, *find_result)
+
+                for name, func in module.__dict__.items():
+                    if callable(func) and not name.startswith('__'):
+                        setattr(module, name, self._wrap(func))
+
+                self._modules[module_name] = module
+
+
+    def __getattr__(self, name):
+        """ retrieve modules loaded from api
+        """
+        if self._modules.get(name, None) is not None:
+            return self._modules[name]
         raise AttributeError(name)
 
-    # def _wrap(self, func, args, kwargs):
-    #     result = func(self._sg, *args, **kwargs)
-    #     return self.execute(*result)
-
     def _wrap(self, func):
+        """ wrap api callable's such that their return values
+            are immediately executed
+        """
         def wrapper(*args, **kwargs):
-            # print "Arguments were: %s, %s" % (args, kwargs)
-            # self._tail, self._params = func(*args, **kwargs)
             tail, params = func(*args, **kwargs)
 
             response_type = self._sg.config.response_type
@@ -105,6 +129,8 @@ class _API(object):
             :param params: Query parameters passed to API. 
             :param keep: Keep filters for next API call. Defaults to False.
         """
+        self._sg.config.validate()
+
         params.update(self._filters)
         if not keep:
             self._filters = {}
@@ -143,9 +169,8 @@ class _API(object):
             return response.text
 
 
-
-
 class SurveyGizmo(object):
     def __init__(self, **kwargs):
-        self.config = _Config(**kwargs)
+        self.config = _Config(self, **kwargs)
         self.api = _API(self)
+        self.api._check_version()
