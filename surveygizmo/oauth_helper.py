@@ -6,13 +6,13 @@ class SGAuthService(rauth.OAuth1Service):
     """ This is a helper class that wraps `rauth.OAuth1Service` and slightly
         simplifies the process of authenciating with SurveyGizmo.
         For further details on the underlying implementation and inherited
-        properties, refer to the rauth documentation. 
+        properties, refer to the rauth documentation.
 
         This class should primarily be used for retrieving an access_token,
-        which can then be provided to the API. To do this, provide the 
+        which can then be provided to the API. To do this, provide the
         `consumer_key` and `consumer_secret` given to you during application
         registration, and make the subsequent calls to `get_authorize_url` and
-        `get_access_token`. 
+        `get_access_token`.
 
         `get_authorize_url` will generate a request token and provide a url
         that directs a user to authenticate your application with SurveyGizmo.
@@ -25,11 +25,11 @@ class SGAuthService(rauth.OAuth1Service):
         should be saved securely and then provided to the API for requests.
 
 
-        This helper class can also be used to directly make custom calls to 
+        This helper class can also be used to directly make custom calls to
         SurveyGizmo's REST API. After calling `get_access_token`, the service
         is able to create a session object through `get_session`, which will
         make the actual requests. Refer to the rauth documentation for more
-        information on `Session` objects. 
+        information on `Session` objects.
         If the original `SGAuthService` object has been discarded,
         reinstantiate it with the `access_token` and `access_token_secret`.
 
@@ -37,10 +37,10 @@ class SGAuthService(rauth.OAuth1Service):
         :type consumer_key: str
         :param consumer_secret: Client consumer secret, required for signing.
         :type consumer_secret: str
-        :param consumer_secret: Client oauth token, required for authenticating.
-        :type consumer_secret: str
-        :param consumer_secret: Client oauth token secret, required for authenticating.
-        :type consumer_secret: str
+        :param access_token: Client oauth token, required for authenticating.
+        :type access_token: str
+        :param access_token_secret: Client oauth token secret, required for authenticating.
+        :type access_token_secret: str
     """
     def __init__(self, consumer_key, consumer_secret,
                  access_token=None, access_token_secret=None):
@@ -65,7 +65,7 @@ class SGAuthService(rauth.OAuth1Service):
         return super(SGAuthService, self).get_authorize_url(self._request_token)
 
     def get_access_token(self, oauth_verifier):
-        """ Retrieves an access token pair form SurveyGizmo. This invalidates the 
+        """ Retrieves an access token pair form SurveyGizmo. This invalidates the
             `oauth_verifier`.
             :param oauth_verifier: Verification code tied to an authorization request.
             :type oauth_verifier: str

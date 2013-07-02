@@ -20,10 +20,10 @@ class _Config(object):
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
         self.md5_hash = kwargs.get('md5_hash', None)
-        self.oauth_consumer_key = kwargs.get('oauth_consumer_key', None)
-        self.oauth_consumer_secret = kwargs.get('oauth_consumer_secret', None)
-        self.oauth_token = kwargs.get('oauth_token', None)
-        self.oauth_token_secret = kwargs.get('oauth_token_secret', None)
+        self.consumer_key = kwargs.get('consumer_key', None)
+        self.consumer_secret = kwargs.get('consumer_secret', None)
+        self.access_token = kwargs.get('access_token', None)
+        self.access_token_secret = kwargs.get('access_token_secret', None)
         self.response_type = kwargs.get('response_type', None)
 
     def validate(self):
@@ -44,8 +44,8 @@ class _Config(object):
                 elif not self.password and not self.md5_hash:
                     raise ImproperlyConfigured("Password or md5 hash of password required for 'user:md5' authentication.")
             elif self.auth_method == "oauth":
-                if not self.oauth_consumer_key or not self.oauth_consumer_secret or \
-                   not self.oauth_token or not self.oauth_token_secret:
+                if not self.consumer_key or not self.consumer_secret or \
+                   not self.access_token or not self.access_token_secret:
                     raise ImproperlyConfigured("OAuth consumer key and secret, and OAuth access token and secret required for 'oauth' authentication.")
 
         if not self.response_type in ["json", "pson", "xml", "debug", None]:
@@ -69,7 +69,7 @@ class _API(object):
         self._sg = _sg
         self._api_version = None
         self._modules = None
-        self._filters = {}
+        self._filters = []
         self._session = None
 
     def _check_version(self):
@@ -94,7 +94,6 @@ class _API(object):
 
                 self._modules[module_name] = module
 
-
     def __getattr__(self, name):
         """ retrieve modules loaded from api
         """
@@ -107,6 +106,7 @@ class _API(object):
             are immediately executed
         """
         def wrapper(*args, **kwargs):
+            keep = kwargs.pop('keep', False)
             tail, params = func(*args, **kwargs)
 
             response_type = self._sg.config.response_type
@@ -114,26 +114,38 @@ class _API(object):
                 tail = "%s.%s" % (tail, response_type)
             tail = "%s/%s" % (self._api_version, tail)
 
-            return self.execute(tail, params)
+            return self.execute(tail, params, keep)
         return wrapper
 
-    def add_filter(self, params):
+    def add_filter(self, field, operator, value):
         """ Add a query filter to be applied to the next API call.
+            :param field: Field name to filter by
+            :type field: str
+            :param operator: Operator value
+            :type operator: str
+            :param value: Value of filter
+            :type value: str
         """
-        pass
+        i = len(self._filters)
+        self._filters.append({
+            'filter[field][%d]' % i: str(field),
+            'filter[operator][%d]' % i: str(operator),
+            'filter[value][%d]' % i: str(value),
+        })
 
     def execute(self, tail, params, keep=False):
         """ Executes a call to the API.
             :param tail: The tail portion of the URL. This should not include
             the domain name.
-            :param params: Query parameters passed to API. 
+            :param params: Query parameters passed to API.
             :param keep: Keep filters for next API call. Defaults to False.
         """
         self._sg.config.validate()
 
-        params.update(self._filters)
+        for _filter in self._filters:
+            params.update(_filter)
         if not keep:
-            self._filters = {}
+            self._filters = []
 
         config = self._sg.config
         if config.auth_method == 'user:pass':
@@ -155,8 +167,8 @@ class _API(object):
         else:  # 'oauth'
             if not self._session:
                 self._session = oauth_helper.SGAuthService(
-                    config.oauth_consumer_key, config.oauth_consumer_secret,
-                    config.oauth_token, config.oauth_token_secret
+                    config.consumer_key, config.consumer_secret,
+                    config.access_token, config.access_token_secret
                 ).get_session()
 
             response = self._session.get(tail, params)
@@ -170,6 +182,8 @@ class _API(object):
 
 
 class SurveyGizmo(object):
+    """
+    """
     def __init__(self, **kwargs):
         self.config = _Config(self, **kwargs)
         self.api = _API(self)
