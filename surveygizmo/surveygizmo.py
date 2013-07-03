@@ -114,7 +114,8 @@ class _API(object):
             api_version = self.head if self._api_version == 'head' else self._api_version
 
             module_list = getattr(__import__('api', globals(), locals(), [api_version]), api_version).__all__
-            search_path = 'surveygizmo/api/%s' % api_version
+            _, package_path, _ = imp.find_module('surveygizmo')
+            search_path = '%s/api/%s' % (package_path, api_version)
 
             for module_name in module_list:
                 find_result = imp.find_module(module_name, [search_path])
