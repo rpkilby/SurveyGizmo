@@ -4,11 +4,14 @@ import requests
 import hashlib
 import imp
 
-# "https://restapi.surveygizmo.com/v1/survey/{$survey}/surveyresponse?user:pass={$user}:{$pass}{$status}{$datesubmmitted}"
-
 
 class ImproperlyConfigured(Exception):
     """ SurveyGizmo is somehow improperly configured."""
+    pass
+
+
+class InvalidFilter(Exception):
+    """ Filter format is invalid."""
     pass
 
 
@@ -59,6 +62,35 @@ class _Config(object):
     def api_version(self, value):
         self._api_version = value
         self._sg.api._check_version()
+
+
+class _Field(object):
+    associations = {
+        'surveyresponse': [
+            '[question(%d)]',
+            '[question(%d), option(%d)]'
+            'datesubmitted',
+            'istestdata',
+            'status',
+            'contact_id',
+        ],
+        'survey': [
+            'createdon',
+            'modifiedon',
+            'title',
+            'subtype',
+            'team',
+            'status',
+        ],
+        'surveycampaign': [
+            '_type',
+            'name',
+            'ssl',
+            'datecreated',
+            'datemodified',
+            'status',
+        ],
+    }
 
 
 class _API(object):
@@ -117,7 +149,7 @@ class _API(object):
             return self.execute(tail, params, keep)
         return wrapper
 
-    def add_filter(self, field, operator, value):
+    def add_filter(self, field, operator, value):  # , object_type=None):
         """ Add a query filter to be applied to the next API call.
             :param field: Field name to filter by
             :type field: str
@@ -125,6 +157,42 @@ class _API(object):
             :type operator: str
             :param value: Value of filter
             :type value: str
+            :param object_type: Optional. Checks field for object association
+            :type object_type: str
+
+            Known Filters:
+                Question                    [question(2)]                   surveyresponse
+                Question Option             [question(2), option(10001)]    surveyresponse
+                Date Submitted              datesubmitted                   surveyresponse
+                Is Test Data                istestdata                      surveyresponse
+                Status                      status                          surveyresponse
+                Contact ID                  contact_id                      surveyresponse
+                Creation Time               createdon                       survey
+                Last Modified Time          modifiedon                      survey
+                Survey Title                title                           survey
+                Type of Project             subtype                         survey
+                Team Survey Belongs To      team                            survey
+                Status                      status                          survey
+                Type of Link                type                            surveycampaign
+                Name of Link                name                            surveycampaign
+                Secure / Unsecure Link      ssl                             surveycampaign
+                Link Created Date           datecreated                     surveycampaign
+                Link Last Modified Date     datemodified                    surveycampaign
+                Status                      status                          surveycampaign
+
+
+            Known Operators:
+                ==
+                !=
+                >=
+                <=
+                >
+                <
+                =           (==)
+                <>          (!=)
+                IS NULL     Value is True or False
+                IS NOT NULL Value is True or False
+                in          Value is comma separated list
         """
         i = len(self._filters)
         self._filters.append({

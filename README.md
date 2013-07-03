@@ -24,10 +24,10 @@ sg.config.password = "password"
 Calls to the api are by object type then by function. For example,
 
 ```python
-sg.api.survey.list_all()
+sg.api.survey.list()
 sg.api.survey.get('39501')
 sg.api.survey.copy('39501', '39501 Copy')
-sg.api.surveyresponse.list_all('39501')
+sg.api.surveyresponse.list('39501')
 ```
 
 ## Authentication
@@ -81,14 +81,14 @@ To filter, add filters to the query before making the api call. eg,
 
 ```python
 sg.api.add_filter('datesubmitted', '<=', '2013-07-01')
-sg.api.surveyresponse.list_all('39501')
+sg.api.surveyresponse.list('39501')
 ```
 
 By default, filters are cleared out after calls to the api. If you want to keep filters for the next call, set the `keep` parameter.
 
 ```python
-sg.api.surveyresponse.list_all('39501', keep=True)
-sg.api.surveyresponse.list_all('39502')
+sg.api.surveyresponse.list('39501', keep=True)
+sg.api.surveyresponse.list('39502')
 ```
 
 ## API functions

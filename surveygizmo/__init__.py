@@ -12,7 +12,7 @@
 
         ...
 
-        >>> surveys = sg.api.survey.list_all()
+        >>> surveys = sg.api.survey.list()
         >>> print surveys
 
 '''

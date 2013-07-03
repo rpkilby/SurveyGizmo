@@ -1,25 +1,22 @@
 
 
 def list(*args, **kwargs):
-    """ Get list of all surveys.
+    """ Get list of all account users.
 
         Optional params:
         - page:             page number
         - resultsperpage:   number of results per page
     """
-    return "survey/", {}
+    return "accountuser/", {}
 
 
-def get(survey_id, *args, **kwargs):
-    """ Get survey by id.
+def get(accountuser_id, *args, **kwargs):
+    """ Get account user by id.
 
         Required params:
-        - survey_id:    survey ID
-
-        Optional params:
-        - metaonly:     exclude page info
+        - accountuser_id:    account user ID
     """
-    tail = "survey/%s" % survey_id
+    tail = "accountuser/%s" % accountuser_id
     params = {
 
     }
@@ -28,20 +25,18 @@ def get(survey_id, *args, **kwargs):
 
 
 def create(title, type, *args, **kwargs):
-    """ Create new survey object.
+    """ Create new account user object.
 
         Required params:
-            - title   survey title
-            - type    select from [survey, form, poll, quiz]
+            - email   email address
 
         Optional params:
-            - status:                   select from [launched, closed, deleted]
-            - theme:                    theme ID
+            - username:
+            - password:
             - team:                     team ID
-            - options[internal_title]:  internal title
-            - blockby:                  select from [NONE, IP, COOKIE]
+            - create_access_token:
     """
-    tail = "survey/"
+    tail = "accountuser/"
     params = {
         '_method': 'PUT',
     }
@@ -49,21 +44,21 @@ def create(title, type, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, *args, **kwargs):
-    """ Change existing survey object.
+def change(accountuser_id, *args, **kwargs):
+    """ Change existing account user object.
 
         Required params:
-        - survey_id: survey ID
+        - accountuser_id: account user ID
 
         Optional params:
-        - title:                    survey title
+        - title:                    account user title
         - status:                   select from [launched, closed, deleted]
         - theme:                    theme ID
         - team:                     team ID
         - options[internal_title]:  internal title
         - blockby:                  select from [NONE, IP, COOKIE]
     """
-    tail = "survey/%s" % survey_id
+    tail = "accountuser/%s" % accountuser_id
     params = {
         '_method': 'POST',
     }
@@ -71,12 +66,12 @@ def change(survey_id, *args, **kwargs):
     return tail, params
 
 
-def copy(survey_id, title, *args, **kwargs):
-    """ Copy new survey object from existing survey.
+def copy(accountuser_id, title, *args, **kwargs):
+    """ Copy new account user object from existing account user.
 
         Required params:
-        - survey_id:    survey ID
-        - title:        survey title
+        - accountuser_id:    account user ID
+        - title:        account user title
 
         Optional params:
         - status:                   select from [launched, closed, deleted]
@@ -85,7 +80,7 @@ def copy(survey_id, title, *args, **kwargs):
         - options[internal_title]:  internal title
         - blockby:                  select from [NONE, IP, COOKIE]
     """
-    tail = "survey/%s" % survey_id
+    tail = "accountuser/%s" % accountuser_id
     params = {
         '_method': 'POST',
         'title': title,
@@ -95,13 +90,13 @@ def copy(survey_id, title, *args, **kwargs):
     return tail, params
 
 
-def delete(survey_id, *args, **kwargs):
-    """ Delete survey object.
+def delete(accountuser_id, *args, **kwargs):
+    """ Delete account user object.
 
         Required params:
-        - survey_id: survey ID
+        - accountuser_id: accountuser ID
     """
-    tail = "survey/%s" % survey_id
+    tail = "accountuser/%s" % accountuser_id
     params = {
         '_method': 'DELETE',
     }
