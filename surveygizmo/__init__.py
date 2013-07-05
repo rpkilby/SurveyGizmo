@@ -18,7 +18,7 @@
 '''
 
 __title__ = 'surveygizmo'
-__version_info__ = ('0', '0', '4')
+__version_info__ = ('0', '0', '5')
 __version__ = '.'.join(__version_info__)
 __author__ = 'Ryan P Kilby'
 __license__ = 'MIT'
@@ -26,5 +26,12 @@ __copyright__ = 'Copyright 2013 Ryan P Kilby'
 __all__ = ['SurveyGizmo', 'ImproperlyConfigured', 'SGAuthService']
 
 
-from .oauth_helper import SGAuthService
-from .surveygizmo import SurveyGizmo, ImproperlyConfigured
+# Hack from rauth. This is necessary for imports during setup/install
+try:
+    from .oauth_helper import SGAuthService
+    from .surveygizmo import SurveyGizmo, ImproperlyConfigured
+
+    # placate pyflakes
+    (SGAuthService, SurveyGizmo, ImproperlyConfigured)
+except ImportError:  # pragma: no cover
+    pass

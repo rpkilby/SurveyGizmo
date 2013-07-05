@@ -27,23 +27,25 @@ def get(survey_id, *args, **kwargs):
     return tail, params
 
 
-def create(title, type, *args, **kwargs):
+def create(title, survey_type, *args, **kwargs):
     """ Create new survey object.
 
         Required params:
-            - title   survey title
-            - type    select from [survey, form, poll, quiz]
+        - title         survey title
+        - survey_type   select from [survey, form, poll, quiz]
 
         Optional params:
-            - status:                   select from [launched, closed, deleted]
-            - theme:                    theme ID
-            - team:                     team ID
-            - options[internal_title]:  internal title
-            - blockby:                  select from [NONE, IP, COOKIE]
+        - status:                   select from [launched, closed, deleted]
+        - theme:                    theme ID
+        - team:                     team ID
+        - options[internal_title]:  internal title
+        - blockby:                  select from [NONE, IP, COOKIE]
     """
     tail = "survey/"
     params = {
         '_method': 'PUT',
+        'title': title,
+        'type': survey_type,
     }
     params.update(kwargs)
     return tail, params
