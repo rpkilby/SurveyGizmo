@@ -6,7 +6,8 @@ README = open(os.path.join(os.path.dirname(__file__), 'README.md')).read()
 
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
-setup(name='SurveyGizmo',
+setup(
+    name='SurveyGizmo',
     version=__version__,
     description='A Python Wrapper for SurveyGizmo\'s restful API service.',
     long_description=README,
@@ -18,7 +19,7 @@ setup(name='SurveyGizmo',
     install_requires=['requests==1.2.3', 'rauth'],
     license='BSD License',
     classifiers=(
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'Programming Language :: Python',

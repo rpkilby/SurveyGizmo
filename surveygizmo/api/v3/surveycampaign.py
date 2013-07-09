@@ -38,11 +38,11 @@ def create(survey_id, campaign_type, *args, **kwargs):
 
         Required params:
         - survey_id         survey ID
-        - campaign_type     select from [link, email, html, js, blog, iframe, popup …]
+        - campaign_type     select from [link, email, html, js, blog, iframe, popup ...]
 
         Optional params:
         - name:         name of the campaign
-        - language:     language of the campaign [Auto, English…]
+        - language:     language of the campaign [Auto, English...]
         - status:       select from [Active, Closed, Deleted]
         - slug:         url slug for the campaign
         - subtype:      distribution link subtype (private), Ex: &subtype=private
@@ -65,7 +65,7 @@ def change(survey_id, campaign_id, *args, **kwargs):
 
         Optional params:
         - name:         name of the campaign
-        - language:     language of the campaign [Auto, English…]
+        - language:     language of the campaign [Auto, English...]
         - status:       select from [Active, Closed, Deleted]
         - slug:         url slug for the campaign
     """
