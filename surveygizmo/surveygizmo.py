@@ -140,6 +140,8 @@ class _API(object):
         """
         def wrapper(*args, **kwargs):
             keep = kwargs.pop('keep', False)
+            url_fetch = kwargs.pop('url_fetch', False)
+
             tail, params = func(*args, **kwargs)
 
             response_type = self._sg.config.response_type
@@ -147,7 +149,10 @@ class _API(object):
                 tail = "%s.%s" % (tail, response_type)
             tail = "%s/%s" % (self._api_version, tail)
 
-            return self.execute(tail, params, keep)
+            vals = self.prepare(tail, params, keep)
+            if url_fetch:
+                return vals
+            return self.execute(*vals)
         return wrapper
 
     def add_filter(self, field, operator, value):  # , object_type=None):
@@ -202,8 +207,8 @@ class _API(object):
             'filter[value][%d]' % i: str(value),
         })
 
-    def execute(self, tail, params, keep=False):
-        """ Executes a call to the API.
+    def prepare(self, tail, params, keep=False):
+        """ Prepares the url and remaining params for execution
             :param tail: The tail portion of the URL. This should not include
             the domain name.
             :param params: Query parameters passed to API.
@@ -221,8 +226,6 @@ class _API(object):
             params.update({
                 config.auth_method: "%s:%s" % (config.username, config.password),
             })
-            url = "%s%s" % (self.base_url, tail)
-            response = requests.get(url, params=params)
 
         elif config.auth_method == 'user:md5':
             if not config.md5_hash:
@@ -230,17 +233,26 @@ class _API(object):
             params.update({
                 config.auth_method: "%s:%s" % (config.username, config.md5_hash),
             })
-            url = "%s%s" % (self.base_url, tail)
-            response = requests.get(url, params=params)
+        url = "%s%s" % (self.base_url, tail)
 
-        else:  # 'oauth'
+        return url, params
+
+    def execute(self, url, params):
+        """ Executes a call to the API.
+            :param url: The full url for the api call.
+            :param params: Query parameters passed to API.
+        """
+        config = self._sg.config
+        if config.auth_method == 'oauth':
             if not self._session:
                 self._session = oauth_helper.SGAuthService(
                     config.consumer_key, config.consumer_secret,
                     config.access_token, config.access_token_secret
                 ).get_session()
 
-            response = self._session.get(tail, params)
+            response = self._session.get(url, params)
+        else:
+            response = requests.get(url, params=params)
 
         response.raise_for_status()
 

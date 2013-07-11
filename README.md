@@ -93,9 +93,9 @@ sg.api.surveyresponse.list('39502')
 
 ## API functions
 
-Only a small subset of the API is currently implemented. This includes survey and surveyresponse objects.
+Only a small subset of the API is currently unimplemented.
 
-    TODO: Implement everything else.
+    TODO: Implement what's left.
 
 
 ## Copyright & License
