@@ -10,7 +10,8 @@ def list(survey_id, *args, **kwargs):
     tail = "survey/%s/surveypage" % survey_id
     params = {
 
-    }.update(kwargs)
+    }
+    params.update(kwargs)
     return tail, params
 
 
@@ -24,7 +25,8 @@ def get(survey_id, page_id, *args, **kwargs):
     tail = "survey/%s/surveypage/%s" % (survey_id, page_id)
     params = {
 
-    }.update(kwargs)
+    }
+    params.update(kwargs)
     return tail, params
 
 
@@ -43,7 +45,8 @@ def create(survey_id, *args, **kwargs):
     tail = "survey/%s/surveypage" % survey_id
     params = {
         '_method': 'PUT',
-    }.update(kwargs)
+    }
+    params.update(kwargs)
     return tail, params
 
 
@@ -57,7 +60,8 @@ def delete(survey_id, page_id, *args, **kwargs):
     tail = "survey/%s/surveypage/%s" % (survey_id, page_id)
     params = {
         '_method': 'DELETE',
-    }.update(kwargs)
+    }
+    params.update(kwargs)
     return tail, params
 
 
@@ -76,5 +80,6 @@ def change(survey_id, page_id, *args, **kwargs):
     tail = "survey/%s/surveypage/%s" % (survey_id, page_id)
     params = {
         '_method': 'POST',
-    }.update(kwargs)
+    }
+    params.update(kwargs)
     return tail, params
