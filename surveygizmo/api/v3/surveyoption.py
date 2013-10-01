@@ -46,7 +46,7 @@ def create(survey_id, question_id, *args, **kwargs):
         - title:        option title
         - value:        option value
     """
-    tail = "survey/%s/surveyquestion%s/surveyoption" % (survey_id, question_id)
+    tail = "survey/%s/surveyquestion/%s/surveyoption" % (survey_id, question_id)
     params = {
         '_method': 'PUT',
     }
