@@ -28,6 +28,7 @@ class _Config(object):
         self.access_token = kwargs.get('access_token', None)
         self.access_token_secret = kwargs.get('access_token_secret', None)
         self.response_type = kwargs.get('response_type', None)
+        self.requests_kwargs = kwargs.get('requests_kwargs', {})
 
     def validate(self):
         """ Perform validation check on properties.
@@ -250,9 +251,9 @@ class _API(object):
                     config.access_token, config.access_token_secret
                 ).get_session()
 
-            response = self._session.get(url, params)
+            response = self._session.get(url, params, **config.requests_kwargs)
         else:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, **config.requests_kwargs)
 
         response.raise_for_status()
 
