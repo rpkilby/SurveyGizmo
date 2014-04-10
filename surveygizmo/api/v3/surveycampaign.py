@@ -33,26 +33,30 @@ def get(survey_id, campaign_id, *args, **kwargs):
     return tail, params
 
 
-def create(survey_id, campaign_type, *args, **kwargs):
+def create(survey_id, campaign_type, campaign_name, *args, **kwargs):
     """ Create new surveycampaign object.
 
         Required params:
         - survey_id         survey ID
         - campaign_type     select from [link, email, html, js, blog, iframe, popup ...]
+        - campaign_name     name of the campaign
 
         Optional params:
-        - name:         name of the campaign
         - language:     language of the campaign [Auto, English...]
         - status:       select from [Active, Closed, Deleted]
         - slug:         url slug for the campaign
         - subtype:      distribution link subtype (private), Ex: &subtype=private
     """
 
-    tail = "survey/%s/surveycampaign/type/%s" % (survey_id, campaign_type)
+    tail = "survey/%s/surveycampaign/" % (survey_id,)
     params = {
         '_method': 'PUT',
     }
     params.update(kwargs)
+    params.update({
+        "type": campaign_type,
+        "name": campaign_name,
+    })
     return tail, params
 
 
