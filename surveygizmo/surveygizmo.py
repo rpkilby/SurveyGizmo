@@ -1,4 +1,3 @@
-
 import oauth_helper
 import requests
 import hashlib
@@ -251,7 +250,7 @@ class _API(object):
                     config.access_token, config.access_token_secret
                 ).get_session()
 
-            response = self._session.get(url, params, **config.requests_kwargs)
+            response = self._session.get(url, params=params, **config.requests_kwargs)
         else:
             response = requests.get(url, params=params, **config.requests_kwargs)
 
