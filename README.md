@@ -32,7 +32,7 @@ sg.api.surveyresponse.list('39501')
 
 ## Authentication
 
-Currently, `user:pass` and `user:md5` are the only supported authentication methods. There is the `oauth_helper` module that is built on top of [rauth](https://github.com/litl/rauth), but it remains untested. You can try. *do it...*
+Currently, `user:pass` and `user:md5` are the only supported authentication methods. There is the `oauth_helper` module that is built on top of [rauth](https://github.com/litl/rauth), but it remains untested. You can try it I guess.
 
 #### user:pass
 ```python
@@ -60,7 +60,7 @@ sg.config.access_token_secret = '54321'
 
 ## Config paramaters
 
-* **api_version** - 'v3', 'head'. Defaults to 'head'
+* **api_version** - 'v3', 'v4', 'head'. Defaults to 'head'
 * **auth_method** - 'user:pass', 'user:md5', 'oauth'
 * **username**
 * **password**
@@ -70,10 +70,13 @@ sg.config.access_token_secret = '54321'
 * **access_token**
 * **access_token_secret**
 * **response_type** - None, 'json', 'pson', 'xml', 'debug'. If None, the response is returned as a python dictionary.
+* **requests_kwargs** - Additional arguments passed to `requests.get`. Useful for setting timeouts and otherwise configuring the requests library.
+* **prepare_url** - Force the client to return the url after being prepared instead of executing the api call. This is useful in cases where you need to call the api asynchronously. Defaults to 'False'
+* **preserve_filters** - Preserve filters between api calls. Defaults to 'False'. When 'True', use 'api.clear_filters' to manually clear the filters.
 
 ## Filters
 
-Filters are currently untested. 
+Filters are currently untested (as is the whole library), but they should work. There is no magic here, just a convenience wrapper around the annoying filtering semantics. You could manually construct and pass these 
 
     TODO: Test filters
 
@@ -96,6 +99,23 @@ sg.api.surveyresponse.list('39502')
 Only a small subset of the API is currently unimplemented.
 
     TODO: Implement what's left.
+
+
+## 0.2.0 Change notes
+
+0.2.0 is a forwards incompatible release, but only minorly so.
+
+Forwards incompatible changes:
+
+- Renamed the 'change' operations to 'update'. This is consistent with SurveyGizmo's API naming.
+- Removed the 'keep' kwarg for preserving filters bettween api funcion calls. This is now configured with 'preserve_filters'. Filters are now cleared manually with `api.clear_filters()`
+- Removed the undocumented 'url_fetch' kwarg, which prevented api executioned and instead returned the prepared url.
+
+Backwards incompatible changes:
+
+- Modified 'api_version' to no longer has any effect on the client. SurveyGizmo provides no way to meaningfully differentiate between API versions, so this checking was unneeded and created code duplication
+- Added 'prepare_url' as a replacement for 'url_fetch'. This forces the client to return the url after being prepared instead of executing the api call. This is useful in cases where you need to call the api asynchronously. 
+- Added 'requests_kwargs'. These are additional arguments passed to `requests.get`. Useful for setting timeouts and otherwise configuring the requests library.
 
 
 ## Copyright & License
