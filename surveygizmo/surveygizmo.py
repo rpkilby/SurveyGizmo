@@ -9,15 +9,10 @@ class ImproperlyConfigured(Exception):
     pass
 
 
-class InvalidFilter(Exception):
-    """ Filter format is invalid."""
-    pass
-
-
 class _Config(object):
     def __init__(self, _sg, **kwargs):
         self._sg = _sg
-        self._api_version = kwargs.get('api_version', 'head')
+        self.api_version = kwargs.get('api_version', 'head')
         self.auth_method = kwargs.get('auth_method', None)
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
@@ -53,44 +48,6 @@ class _Config(object):
 
         if not self.response_type in ["json", "pson", "xml", "debug", None]:
             raise ImproperlyConfigured()
-
-    @property
-    def api_version(self):
-        return self._api_version
-
-    @api_version.setter
-    def api_version(self, value):
-        self._api_version = value
-        self._sg.api._check_version()
-
-
-class _Field(object):
-    associations = {
-        'surveyresponse': [
-            '[question(%d)]',
-            '[question(%d), option(%d)]'
-            'datesubmitted',
-            'istestdata',
-            'status',
-            'contact_id',
-        ],
-        'survey': [
-            'createdon',
-            'modifiedon',
-            'title',
-            'subtype',
-            'team',
-            'status',
-        ],
-        'surveycampaign': [
-            '_type',
-            'name',
-            'ssl',
-            'datecreated',
-            'datemodified',
-            'status',
-        ],
-    }
 
 
 class _API(object):
