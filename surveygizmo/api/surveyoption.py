@@ -70,8 +70,8 @@ def delete(survey_id, question_id, option_id, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, question_id, option_id, *args, **kwargs):
-    """ Change existing surveyoption object.
+def update(survey_id, question_id, option_id, *args, **kwargs):
+    """ Update existing surveyoption object.
 
         Required params:
         - survey_id:    survey ID

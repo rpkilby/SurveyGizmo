@@ -60,8 +60,8 @@ def create(survey_id, campaign_type, campaign_name, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, campaign_id, *args, **kwargs):
-    """ Change existing surveycampaign object.
+def update(survey_id, campaign_id, *args, **kwargs):
+    """ Update existing surveycampaign object.
 
         Required params:
         - survey_id:    survey ID

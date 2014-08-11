@@ -42,8 +42,8 @@ def create(*args, **kwargs):
     return tail, params
 
 
-def change(accountteams_id, *args, **kwargs):
-    """ Change existing accountteams object.
+def update(accountteams_id, *args, **kwargs):
+    """ Update existing accountteams object.
 
         Required params:
         - accountteams_id:  accountteams ID

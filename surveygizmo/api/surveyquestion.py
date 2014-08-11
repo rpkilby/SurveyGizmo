@@ -72,8 +72,8 @@ def delete(survey_id, question_id, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, question_id, *args, **kwargs):
-    """ Change existing surveyquestion object.
+def update(survey_id, question_id, *args, **kwargs):
+    """ Update existing surveyquestion object.
 
         Required params:
         - survey_id:    survey ID

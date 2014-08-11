@@ -45,8 +45,8 @@ def create(email, *args, **kwargs):
     return tail, params
 
 
-def change(accountuser_id, *args, **kwargs):
-    """ Change existing accountuser object.
+def update(accountuser_id, *args, **kwargs):
+    """ Update existing accountuser object.
 
         Required params:
         - accountuser_id:       accountuser ID

@@ -51,8 +51,8 @@ def create(title, survey_type, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, *args, **kwargs):
-    """ Change existing survey object.
+def update(survey_id, *args, **kwargs):
+    """ Update existing survey object.
 
         Required params:
         - survey_id: survey ID

@@ -65,8 +65,8 @@ def delete(survey_id, page_id, *args, **kwargs):
     return tail, params
 
 
-def change(survey_id, page_id, *args, **kwargs):
-    """ Change existing surveypage object.
+def update(survey_id, page_id, *args, **kwargs):
+    """ Update existing surveypage object.
 
         Required params:
         - survey_id:    survey ID
