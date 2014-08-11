@@ -14,7 +14,7 @@ class ImproperlyConfigured(Exception):
     pass
 
 
-class _Config(object):
+class Config(object):
     def __init__(self, _sg, **kwargs):
         self._sg = _sg
         self.api_version = kwargs.get('api_version', 'head')
@@ -26,8 +26,11 @@ class _Config(object):
         self.consumer_secret = kwargs.get('consumer_secret', None)
         self.access_token = kwargs.get('access_token', None)
         self.access_token_secret = kwargs.get('access_token_secret', None)
+
         self.response_type = kwargs.get('response_type', None)
         self.requests_kwargs = kwargs.get('requests_kwargs', {})
+        self.prepare_url = kwargs.get('prepare_url', False)
+        self.preserve_filters = kwargs.get('preserve_filters', False)
 
     def validate(self):
         """ Perform validation check on properties.
@@ -52,20 +55,22 @@ class _Config(object):
             raise ImproperlyConfigured()
 
 
-class _API(object):
+class API(object):
     base_url = "https://restapi.surveygizmo.com/"
 
     def __init__(self, config):
         self._config = config
 
-        self._resources = None
+        self._resources = {}
         self._filters = []
         self._session = None
 
+        self._import_api()
+
     def _import_api(self):
-        """ update api modules, wrap callables.
+        """ update api resources, wrap callables.
         """
-        resources = __import__('surveygizmo.api', globals(), locals(), ['*'])
+        resources = __import__('api', globals(), locals(), ['*'])
 
         for resource_name in resources.__all__:
             resource = getattr(resources, resource_name)
@@ -77,34 +82,13 @@ class _API(object):
             self._resources[resource_name] = resource
 
     def __getattr__(self, name):
-        """ retrieve modules loaded from api
+        """ retrieve resources loaded from api
         """
-        if self._modules.get(name, None) is not None:
-            return self._modules[name]
+        if self._resources.get(name, None) is not None:
+            return self._resources[name]
         raise AttributeError(name)
 
-    def _wrap(self, func):
-        """ wrap api callable's such that their return values
-            are immediately executed
-        """
-        def wrapper(*args, **kwargs):
-            keep = kwargs.pop('keep', False)
-            url_fetch = kwargs.pop('url_fetch', False)
-
-            tail, params = func(*args, **kwargs)
-
-            response_type = self._sg.config.response_type
-            if response_type:
-                tail = "%s.%s" % (tail, response_type)
-            tail = "%s/%s" % (self._api_version, tail)
-
-            vals = self.prepare(tail, params, keep)
-            if url_fetch:
-                return vals
-            return self.execute(*vals)
-        return wrapper
-
-    def add_filter(self, field, operator, value):  # , object_type=None):
+    def add_filter(self, field, operator, value):
         """ Add a query filter to be applied to the next API call.
             :param field: Field name to filter by
             :type field: str
@@ -156,20 +140,54 @@ class _API(object):
             'filter[value][%d]' % i: str(value),
         })
 
-    def prepare(self, tail, params, keep=False):
+    def get_filters(self):
+        params = {}
+        for _filter in self._filters:
+            params.update(_filter)
+        if not self._config.preserve_filters:
+            self.clear_filters()
+
+        return params
+
+    def clear_filters(self):
+        self._filters = []
+
+    def _wrap(self, func):
+        """ wrap api callable's such that their return values
+            are immediately executed
+        """
+        # in case of repeat imports, prevents re-wrapping object
+        if hasattr(func, '_wrapped') and func._wrapped:
+            logger.debug('attempting to rewrap %s' % str(func))
+            return func
+
+        def wrapped(*args, **kwargs):
+            tail, params = func(*args, **kwargs)
+
+            if self._config.response_type:
+                tail = "%s.%s" % (tail, self._config.response_type)
+            tail = "%s/%s" % (self._config.api_version, tail)
+
+            vals = self.prepare(tail, params)
+            if self._config.prepare_url:
+                return vals
+            return self.execute(*vals)
+
+        wrapped.__name__ = func.__name__
+        wrapped.__doc__ = func.__doc__
+        wrapped._wrapped = True
+        return wrapped
+
+    def prepare(self, tail, params):
         """ Prepares the url and remaining params for execution
             :param tail: The tail portion of the URL. This should not include
             the domain name.
             :param params: Query parameters passed to API.
-            :param keep: Keep filters for next API call. Defaults to False.
         """
         config = self._config
         config.validate()
 
-        for _filter in self._filters:
-            params.update(_filter)
-        if not keep:
-            self._filters = []
+        params.update(self.get_filters())
 
         if config.auth_method == 'user:pass':
             params.update({
@@ -212,9 +230,8 @@ class _API(object):
 
 
 class SurveyGizmo(object):
-    """
+    """ SurveyGizmo API client.
     """
     def __init__(self, **kwargs):
-        self.config = _Config(self, **kwargs)
-        self.api = _API(self.config)
-        # self.api._import_api()
+        self.config = Config(self, **kwargs)
+        self.api = API(self.config)
