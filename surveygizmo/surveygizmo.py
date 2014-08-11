@@ -1,7 +1,12 @@
+
+import collections
+import hashlib
+import logging
+
 import oauth_helper
 import requests
-import hashlib
-import imp
+
+logger = logging.getLogger(__name__)
 
 
 class ImproperlyConfigured(Exception):
@@ -27,9 +32,6 @@ class _Config(object):
     def validate(self):
         """ Perform validation check on properties.
         """
-        if not self.api_version in ['v3', 'head']:
-            raise ImproperlyConfigured("API version provided is invalid.")
-
         if not self.auth_method in ['user:pass', 'user:md5', 'oauth']:
             raise ImproperlyConfigured("No authentication method provided.")
         else:
@@ -52,37 +54,27 @@ class _Config(object):
 
 class _API(object):
     base_url = "https://restapi.surveygizmo.com/"
-    head = 'v3'
 
-    def __init__(self, _sg):
-        self._sg = _sg
-        self._api_version = None
-        self._modules = None
+    def __init__(self, config):
+        self._config = config
+
+        self._resources = None
         self._filters = []
         self._session = None
 
-    def _check_version(self):
+    def _import_api(self):
         """ update api modules, wrap callables.
         """
-        if self._api_version != self._sg.config.api_version:
-            self._api_version = self._sg.config.api_version
-            self._modules = {}
+        resources = __import__('surveygizmo.api', globals(), locals(), ['*'])
 
-            api_version = self.head if self._api_version == 'head' else self._api_version
+        for resource_name in resources.__all__:
+            resource = getattr(resources, resource_name)
 
-            module_list = getattr(__import__('api', globals(), locals(), [api_version]), api_version).__all__
-            _, package_path, _ = imp.find_module('surveygizmo')
-            search_path = '%s/api/%s' % (package_path, api_version)
+            for name, func in resource.__dict__.items():
+                if isinstance(func, collections.Callable) and not name.startswith('__'):
+                    setattr(resource, name, self._wrap(func))
 
-            for module_name in module_list:
-                find_result = imp.find_module(module_name, [search_path])
-                module = imp.load_module("_api_loaded_%s" % module_name, *find_result)
-
-                for name, func in module.__dict__.items():
-                    if callable(func) and not name.startswith('__'):
-                        setattr(module, name, self._wrap(func))
-
-                self._modules[module_name] = module
+            self._resources[resource_name] = resource
 
     def __getattr__(self, name):
         """ retrieve modules loaded from api
@@ -171,14 +163,14 @@ class _API(object):
             :param params: Query parameters passed to API.
             :param keep: Keep filters for next API call. Defaults to False.
         """
-        self._sg.config.validate()
+        config = self._config
+        config.validate()
 
         for _filter in self._filters:
             params.update(_filter)
         if not keep:
             self._filters = []
 
-        config = self._sg.config
         if config.auth_method == 'user:pass':
             params.update({
                 config.auth_method: "%s:%s" % (config.username, config.password),
@@ -199,7 +191,7 @@ class _API(object):
             :param url: The full url for the api call.
             :param params: Query parameters passed to API.
         """
-        config = self._sg.config
+        config = self._config
         if config.auth_method == 'oauth':
             if not self._session:
                 self._session = oauth_helper.SGAuthService(
@@ -224,5 +216,5 @@ class SurveyGizmo(object):
     """
     def __init__(self, **kwargs):
         self.config = _Config(self, **kwargs)
-        self.api = _API(self)
-        self.api._check_version()
+        self.api = _API(self.config)
+        # self.api._import_api()
