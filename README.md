@@ -119,5 +119,5 @@ Backwards incompatible changes:
 
 
 ## Copyright & License
-Copyright &copy; 2013 Ryan P Kilby. See LICENSE for details.
+Copyright &copy; 2013-2014 NC State University. See LICENSE for details.
 

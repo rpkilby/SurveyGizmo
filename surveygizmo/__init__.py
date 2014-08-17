@@ -21,8 +21,8 @@ __title__ = 'surveygizmo'
 __version_info__ = ('0', '2', '0')
 __version__ = '.'.join(__version_info__)
 __author__ = 'Ryan P Kilby'
-__license__ = 'MIT'
-__copyright__ = 'Copyright 2013 Ryan P Kilby'
+__license__ = 'BSD 3-Clause'
+__copyright__ = 'Copyright 2013-2014 NC State University'
 __all__ = ['SurveyGizmo', 'ImproperlyConfigured', 'SGAuthService']
 
 
