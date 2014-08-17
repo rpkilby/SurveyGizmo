@@ -73,6 +73,7 @@ sg.config.access_token_secret = '54321'
 * **requests_kwargs** - Additional arguments passed to `requests.get`. Useful for setting timeouts and otherwise configuring the requests library.
 * **prepare_url** - Force the client to return the url after being prepared instead of executing the api call. This is useful in cases where you need to call the api asynchronously. Defaults to 'False'
 * **preserve_filters** - Preserve filters between api calls. Defaults to 'False'. When 'True', use 'api.clear_filters' to manually clear the filters.
+* **handler52x** - Handler for CloudFlare's 52x errors. Expects a callable (e.g., `surveygizmo.default_52xhandler`). Defaults to 'None'.
 
 ## Filters
 
@@ -93,6 +94,11 @@ By default, filters are cleared out after calls to the api. If you want to keep 
 sg.api.surveyresponse.list('39501', keep=True)
 sg.api.surveyresponse.list('39502')
 ```
+
+## CloudFlare 52x Errors
+
+After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity issues where the service is temporarily unreachable. These errors exist on the 52x range of HTTP status codes. To automatically handle 52x errors, set a callable for `config.handler52x`. A basic handler is provided under `surveygizmo.default_52xhandler`, which simply retries the request every second until a non-52x response is returned.
+
 
 ## API functions
 

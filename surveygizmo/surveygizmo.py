@@ -2,6 +2,7 @@
 import collections
 import hashlib
 import logging
+import time
 
 import oauth_helper
 import requests
@@ -12,6 +13,25 @@ logger = logging.getLogger(__name__)
 class ImproperlyConfigured(Exception):
     """ SurveyGizmo is somehow improperly configured."""
     pass
+
+
+def default_52xhandler(response, requests_kwargs, response_type):
+    """ Default 52x handler that loops every second until a non 52x response is received.
+        :param response: The response of the last executed request
+        :param response_type: The expected response format. Defaults to config.response_type.
+    """
+    time.sleep(1)
+    response = requests.get(response.url, **requests_kwargs)
+
+    if 520 <= response.status_code < 530:
+        return default_52xhandler(response, requests_kwargs, response_type)
+
+    response.raise_for_status()
+
+    if not response_type:
+        return response.json()
+    else:
+        return response.text()
 
 
 class Config(object):
@@ -31,6 +51,7 @@ class Config(object):
         self.requests_kwargs = kwargs.get('requests_kwargs', {})
         self.prepare_url = kwargs.get('prepare_url', False)
         self.preserve_filters = kwargs.get('preserve_filters', False)
+        self.handler52x = kwargs.get('handler52x', None)
 
     def validate(self):
         """ Perform validation check on properties.
@@ -220,6 +241,10 @@ class API(object):
             response = self._session.get(url, params=params, **config.requests_kwargs)
         else:
             response = requests.get(url, params=params, **config.requests_kwargs)
+
+        if 520 <= response.status_code < 530:
+            if self._config.handler52x:
+                return self._config.handler52x(response, config.requests_kwargs, config.response_type)
 
         response.raise_for_status()
 
