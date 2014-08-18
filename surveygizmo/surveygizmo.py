@@ -1,6 +1,5 @@
 
 import time
-import requests
 from api import base
 
 
@@ -9,23 +8,15 @@ class ImproperlyConfigured(Exception):
     pass
 
 
-def default_52xhandler(response, requests_kwargs, response_type):
+def default_52xhandler(response, resource, url, params):
     """ Default 52x handler that loops every second until a non 52x response is received.
-        :param response: The response of the last executed request
-        :param response_type: The expected response format. Defaults to config.response_type.
+        :param response: The response of the last executed api request.
+        :param resource: The resource of the last executed api request.
+        :param url: The url of the last executed api request sans encoded query parameters.
+        :param params: The query params of the last executed api request in dictionary format.
     """
     time.sleep(1)
-    response = requests.get(response.url, **requests_kwargs)
-
-    if 520 <= response.status_code < 530:
-        return default_52xhandler(response, requests_kwargs, response_type)
-
-    response.raise_for_status()
-
-    if not response_type:
-        return response.json()
-    else:
-        return response.text()
+    return resource.execute(url, params)
 
 
 class Config(object):

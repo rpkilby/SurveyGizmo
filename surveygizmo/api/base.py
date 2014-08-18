@@ -167,7 +167,7 @@ class Resource(object):
     def execute(self, url, params):
         """ Executes a call to the API.
             :param url: The full url for the api call.
-            :param params: Query parameters passed to API.
+            :param params: Query parameters encoded in the request.
         """
         config = self._config
 
@@ -175,7 +175,7 @@ class Resource(object):
             if not self._api._session:
                 self._api._session = oauth_helper.SGAuthService(
                     config.consumer_key, config.consumer_secret,
-                    config.access_token, config.access_token_secret
+                    config.access_token, config.access_token_secret,
                 ).get_session()
 
             response = self._api._session.get(url, params=params, **config.requests_kwargs)
@@ -184,7 +184,7 @@ class Resource(object):
 
         if 520 <= response.status_code < 530:
             if config.handler52x:
-                return config.handler52x(response, config.requests_kwargs, config.response_type)
+                return config.handler52x(response, self, url, params)
 
         response.raise_for_status()
 
