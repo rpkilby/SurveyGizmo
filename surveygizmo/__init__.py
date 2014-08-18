@@ -18,7 +18,7 @@
 '''
 
 __title__ = 'surveygizmo'
-__version_info__ = ('0', '2', '0')
+__version_info__ = ('1', '0', '0')
 __version__ = '.'.join(__version_info__)
 __author__ = 'Ryan P Kilby'
 __license__ = 'BSD 3-Clause'

@@ -1,13 +1,7 @@
 
-import collections
-import hashlib
-import logging
 import time
-
-import oauth_helper
 import requests
-
-logger = logging.getLogger(__name__)
+from api import base
 
 
 class ImproperlyConfigured(Exception):
@@ -83,24 +77,21 @@ class API(object):
         self._config = config
 
         self._resources = {}
-        self._filters = []
         self._session = None
 
         self._import_api()
 
     def _import_api(self):
-        """ update api resources, wrap callables.
+        """ Instantiates API resources and adds them to the API instance. e.g., The
+            `surveygizmo.api.survey.Survey` resource is callable as `sg.api.survey`.
         """
         resources = __import__('api', globals(), locals(), ['*'])
 
         for resource_name in resources.__all__:
             resource = getattr(resources, resource_name)
 
-            for name, func in resource.__dict__.items():
-                if isinstance(func, collections.Callable) and not name.startswith('__'):
-                    setattr(resource, name, self._wrap(func))
-
-            self._resources[resource_name] = resource
+            if issubclass(resource, base.Resource):
+                self._resources[resource_name.lower()] = resource(self)
 
     def __getattr__(self, name):
         """ retrieve resources loaded from api
@@ -108,150 +99,6 @@ class API(object):
         if self._resources.get(name, None) is not None:
             return self._resources[name]
         raise AttributeError(name)
-
-    def add_filter(self, field, operator, value):
-        """ Add a query filter to be applied to the next API call.
-            :param field: Field name to filter by
-            :type field: str
-            :param operator: Operator value
-            :type operator: str
-            :param value: Value of filter
-            :type value: str
-            :param object_type: Optional. Checks field for object association
-            :type object_type: str
-
-            Known Filters:
-                Question                    [question(2)]                   surveyresponse
-                Question Option             [question(2), option(10001)]    surveyresponse
-                Date Submitted              datesubmitted                   surveyresponse
-                Is Test Data                istestdata                      surveyresponse
-                Status                      status                          surveyresponse
-                Contact ID                  contact_id                      surveyresponse
-                Creation Time               createdon                       survey
-                Last Modified Time          modifiedon                      survey
-                Survey Title                title                           survey
-                Type of Project             subtype                         survey
-                Team Survey Belongs To      team                            survey
-                Status                      status                          survey
-                Type of Link                type                            surveycampaign
-                Name of Link                name                            surveycampaign
-                Secure / Unsecure Link      ssl                             surveycampaign
-                Link Created Date           datecreated                     surveycampaign
-                Link Last Modified Date     datemodified                    surveycampaign
-                Status                      status                          surveycampaign
-
-
-            Known Operators:
-                ==
-                !=
-                >=
-                <=
-                >
-                <
-                =           (==)
-                <>          (!=)
-                IS NULL     Value is True or False
-                IS NOT NULL Value is True or False
-                in          Value is comma separated list
-        """
-        i = len(self._filters)
-        self._filters.append({
-            'filter[field][%d]' % i: str(field),
-            'filter[operator][%d]' % i: str(operator),
-            'filter[value][%d]' % i: str(value),
-        })
-
-    def get_filters(self):
-        params = {}
-        for _filter in self._filters:
-            params.update(_filter)
-        if not self._config.preserve_filters:
-            self.clear_filters()
-
-        return params
-
-    def clear_filters(self):
-        self._filters = []
-
-    def _wrap(self, func):
-        """ wrap api callable's such that their return values
-            are immediately executed
-        """
-        # in case of repeat imports, prevents re-wrapping object
-        if hasattr(func, '_wrapped') and func._wrapped:
-            logger.debug('attempting to rewrap %s' % str(func))
-            return func
-
-        def wrapped(*args, **kwargs):
-            tail, params = func(*args, **kwargs)
-
-            if self._config.response_type:
-                tail = "%s.%s" % (tail, self._config.response_type)
-            tail = "%s/%s" % (self._config.api_version, tail)
-
-            vals = self.prepare(tail, params)
-            if self._config.prepare_url:
-                return vals
-            return self.execute(*vals)
-
-        wrapped.__name__ = func.__name__
-        wrapped.__doc__ = func.__doc__
-        wrapped._wrapped = True
-        return wrapped
-
-    def prepare(self, tail, params):
-        """ Prepares the url and remaining params for execution
-            :param tail: The tail portion of the URL. This should not include
-            the domain name.
-            :param params: Query parameters passed to API.
-        """
-        config = self._config
-        config.validate()
-
-        params.update(self.get_filters())
-
-        if config.auth_method == 'user:pass':
-            params.update({
-                config.auth_method: "%s:%s" % (config.username, config.password),
-            })
-
-        elif config.auth_method == 'user:md5':
-            if not config.md5_hash:
-                config.md5_hash = hashlib.md5(config.password).hexdigest()
-            params.update({
-                config.auth_method: "%s:%s" % (config.username, config.md5_hash),
-            })
-        url = "%s%s" % (self.base_url, tail)
-
-        return url, params
-
-    def execute(self, url, params):
-        """ Executes a call to the API.
-            :param url: The full url for the api call.
-            :param params: Query parameters passed to API.
-        """
-        config = self._config
-        if config.auth_method == 'oauth':
-            if not self._session:
-                self._session = oauth_helper.SGAuthService(
-                    config.consumer_key, config.consumer_secret,
-                    config.access_token, config.access_token_secret
-                ).get_session()
-
-            response = self._session.get(url, params=params, **config.requests_kwargs)
-        else:
-            response = requests.get(url, params=params, **config.requests_kwargs)
-
-        if 520 <= response.status_code < 530:
-            if self._config.handler52x:
-                return self._config.handler52x(response, config.requests_kwargs, config.response_type)
-
-        response.raise_for_status()
-
-        if not config.response_type:
-            return response.json()
-        else:
-            return response.text
 
 
 class SurveyGizmo(object):

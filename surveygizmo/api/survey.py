@@ -1,111 +1,101 @@
 
-
-def list(*args, **kwargs):
-    """ Get list of all surveys.
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    return "survey/", {}
+from surveygizmo.api import base
 
 
-def get(survey_id, *args, **kwargs):
-    """ Get survey by id.
+class Survey(base.Resource):
+    resource_sub_str = 'survey/%(survey_id)s'
+    resource_id_keys = ['survey_id']
+    copyable = True
 
-        Required params:
-        - survey_id:    survey ID
+    def list(self, **kwargs):
+        """ Get list of all surveys.
 
-        Optional params:
-        - metaonly:     exclude page info
-    """
-    tail = "survey/%s" % survey_id
-    params = {
+            Optional params:
+            - page:             page number
+            - resultsperpage:   number of results per page
+        """
+        return super(Survey, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, survey_id, **kwargs):
+        """ Get survey by id.
 
+            Required params:
+            - survey_id:    survey ID
 
-def create(title, survey_type, *args, **kwargs):
-    """ Create new survey object.
+            Optional params:
+            - metaonly:     exclude page info
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+        })
+        return super(Survey, self).get(**kwargs)
 
-        Required params:
-        - title         survey title
-        - survey_type   select from [survey, form, poll, quiz]
+    def create(self, title, survey_type, **kwargs):
+        """ Create new survey object.
 
-        Optional params:
-        - status:                   select from [launched, closed, deleted]
-        - theme:                    theme ID
-        - team:                     team ID
-        - options[internal_title]:  internal title
-        - blockby:                  select from [NONE, IP, COOKIE]
-    """
-    tail = "survey/"
-    params = {
-        '_method': 'PUT',
-        'title': title,
-        'type': survey_type,
-    }
-    params.update(kwargs)
-    return tail, params
+            Required params:
+            - title         survey title
+            - survey_type   select from [survey, form, poll, quiz]
 
+            Optional params:
+            - status:                   select from [launched, closed, deleted]
+            - theme:                    theme ID
+            - team:                     team ID
+            - options[internal_title]:  internal title
+            - blockby:                  select from [NONE, IP, COOKIE]
+        """
+        kwargs.update({
+            'title': title,
+            'type': survey_type,
+        })
+        return super(Survey, self).create(**kwargs)
 
-def update(survey_id, *args, **kwargs):
-    """ Update existing survey object.
+    def update(self, survey_id, **kwargs):
+        """ Update existing survey object.
 
-        Required params:
-        - survey_id: survey ID
+            Required params:
+            - survey_id: survey ID
 
-        Optional params:
-        - title:                    survey title
-        - status:                   select from [launched, closed, deleted]
-        - theme:                    theme ID
-        - team:                     team ID
-        - options[internal_title]:  internal title
-        - blockby:                  select from [NONE, IP, COOKIE]
-    """
-    tail = "survey/%s" % survey_id
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
+            Optional params:
+            - title:                    survey title
+            - status:                   select from [launched, closed, deleted]
+            - theme:                    theme ID
+            - team:                     team ID
+            - options[internal_title]:  internal title
+            - blockby:                  select from [NONE, IP, COOKIE]
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+        })
+        return super(Survey, self).update(**kwargs)
 
+    def copy(self, survey_id, title, **kwargs):
+        """ Copy new survey object from existing survey.
 
-def copy(survey_id, title, *args, **kwargs):
-    """ Copy new survey object from existing survey.
+            Required params:
+            - survey_id:    survey ID
+            - title:        survey title
 
-        Required params:
-        - survey_id:    survey ID
-        - title:        survey title
+            Optional params:
+            - status:                   select from [launched, closed, deleted]
+            - theme:                    theme ID
+            - team:                     team ID
+            - options[internal_title]:  internal title
+            - blockby:                  select from [NONE, IP, COOKIE]
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'title': title,
+        })
+        return super(Survey, self).copy(**kwargs)
 
-        Optional params:
-        - status:                   select from [launched, closed, deleted]
-        - theme:                    theme ID
-        - team:                     team ID
-        - options[internal_title]:  internal title
-        - blockby:                  select from [NONE, IP, COOKIE]
-    """
-    tail = "survey/%s" % survey_id
-    params = {
-        '_method': 'POST',
-        'title': title,
-        'copy': 'true',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, survey_id, **kwargs):
+        """ Delete survey object.
 
-
-def delete(survey_id, *args, **kwargs):
-    """ Delete survey object.
-
-        Required params:
-        - survey_id: survey ID
-    """
-    tail = "survey/%s" % survey_id
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
+            Required params:
+            - survey_id: survey ID
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+        })
+        return super(Survey, self).delete(**kwargs)
