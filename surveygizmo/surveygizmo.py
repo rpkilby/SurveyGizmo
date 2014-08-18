@@ -20,8 +20,7 @@ def default_52xhandler(response, resource, url, params):
 
 
 class Config(object):
-    def __init__(self, _sg, **kwargs):
-        self._sg = _sg
+    def __init__(self, **kwargs):
         self.api_version = kwargs.get('api_version', 'head')
         self.auth_method = kwargs.get('auth_method', None)
         self.username = kwargs.get('username', None)
@@ -65,7 +64,7 @@ class API(object):
     base_url = "https://restapi.surveygizmo.com/"
 
     def __init__(self, config):
-        self._config = config
+        self.config = config
 
         self._resources = {}
         self._session = None
@@ -82,7 +81,7 @@ class API(object):
             resource = getattr(resources, resource_name)
 
             if issubclass(resource, base.Resource):
-                self._resources[resource_name.lower()] = resource(self)
+                self._resources[resource_name.lower()] = resource(self, self.config)
 
     def __getattr__(self, name):
         """ retrieve resources loaded from api
@@ -96,5 +95,5 @@ class SurveyGizmo(object):
     """ SurveyGizmo API client.
     """
     def __init__(self, **kwargs):
-        self.config = Config(self, **kwargs)
+        self.config = Config(**kwargs)
         self.api = API(self.config)

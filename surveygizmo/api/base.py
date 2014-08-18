@@ -11,10 +11,10 @@ class Resource(object):
     resource_sub_str = ''
     resource_id_keys = []
 
-    def __init__(self, api):
-        self._api = api
-        self._config = api._config
+    def __init__(self, api, config):
         self._filters = []
+        self.api = api
+        self.config = config
         self.base_url = api.base_url
 
         if not self.copyable:
@@ -90,7 +90,7 @@ class Resource(object):
 
     def list(self, **kwargs):
         kwargs.update(self.filters)
-        if not self._config.preserve_filters:
+        if not self.config.preserve_filters:
             self.clear_filters()
         return self._api_call(**kwargs)
 
@@ -123,11 +123,11 @@ class Resource(object):
         return self._api_call(**kwargs)
 
     def _api_call(self, **kwargs):
-        self._config.validate()
+        self.config.validate()
         url = self._prepare_url(kwargs)
         params = self._prepare_params(kwargs)
 
-        if self._config.prepare_url:
+        if self.config.prepare_url:
             return url, params
         return self.execute(url, params)
 
@@ -140,15 +140,15 @@ class Resource(object):
         path = self.resource_sub_str % ids
 
         # API version and response format
-        if self._config.response_type:
-            path = "%s.%s" % (path, self._config.response_type)
-        path = "%s/%s" % (self._config.api_version, path)
+        if self.config.response_type:
+            path = "%s.%s" % (path, self.config.response_type)
+        path = "%s/%s" % (self.config.api_version, path)
 
         # full url
         return "%s%s" % (self.base_url, path)
 
     def _prepare_params(self, kwargs):
-        config = self._config
+        config = self.config
 
         if config.auth_method == 'user:pass':
             kwargs.update({
@@ -169,16 +169,16 @@ class Resource(object):
             :param url: The full url for the api call.
             :param params: Query parameters encoded in the request.
         """
-        config = self._config
+        config = self.config
 
         if config.auth_method == 'oauth':
-            if not self._api._session:
-                self._api._session = oauth_helper.SGAuthService(
+            if not self.api._session:
+                self.api._session = oauth_helper.SGAuthService(
                     config.consumer_key, config.consumer_secret,
                     config.access_token, config.access_token_secret,
                 ).get_session()
 
-            response = self._api._session.get(url, params=params, **config.requests_kwargs)
+            response = self.api._session.get(url, params=params, **config.requests_kwargs)
         else:
             response = requests.get(url, params=params, **config.requests_kwargs)
 
