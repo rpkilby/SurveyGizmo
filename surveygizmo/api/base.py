@@ -7,8 +7,7 @@ from surveygizmo import oauth_helper
 
 class Resource(object):
     base_url = ''
-    copyable = False
-    resource_sub_str = ''
+    resource_fmt_str = ''
     resource_id_keys = []
 
     def __init__(self, api, config):
@@ -16,9 +15,6 @@ class Resource(object):
         self.api = api
         self.config = config
         self.base_url = api.base_url
-
-        if not self.copyable:
-            del self.copy
 
     def filter(self, field, operator, value):
         """ Add a query filter to be applied to the next API list call for this resource.
@@ -137,7 +133,7 @@ class Resource(object):
         for id_key in self.resource_id_keys:
             ids[id_key] = kwargs.pop(id_key, '')
 
-        path = self.resource_sub_str % ids
+        path = self.resource_fmt_str % ids
 
         # API version and response format
         if self.config.response_type:

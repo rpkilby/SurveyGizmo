@@ -1,83 +1,91 @@
 
-def list(survey_id, campaign_id, *args, **kwargs):
-    """ Get list of all email messages for a survey campaign.
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    tail = "survey/%s/surveycampaign/%s/emailmessage" % (survey_id, campaign_id)
-    params = {
-
-    }
-    params.update(kwargs)
-    return tail, params
+from surveygizmo.api import base
 
 
-def get(survey_id, campaign_id, message_id, *args, **kwargs):
-    """ Get email message by id.
+class EmailMessage(base.Resource):
+    resource_fmt_str = 'survey/%(survey_id)s/surveycampaign/%(campaign_id)s/emailmessage/%(message_id)s'
+    resource_id_keys = ['survey_id', 'campaign_id', 'message_id']
 
-        Required params:
-        - survey_id:    survey ID
-        - campaign_id:  campaign ID
-        - message_id:   message ID
-    """
-    tail = "survey/%s/surveycampaign/%s/emailmessage/%s" % (survey_id, campaign_id, message_id)
-    params = {
+    def list(self, survey_id, campaign_id, **kwargs):
+        """ Get list of all email messages for a survey campaign.
 
-    }
-    params.update(kwargs)
-    return tail, params
+            Required params:
+            - survey_id:    survey ID
+            - campaign_id:  campaign ID
 
+            Optional params:
+            - page:             page number
+            - resultsperpage:   number of results per page
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'campaign_id': campaign_id,
+        })
+        return super(EmailMessage, self).list(**kwargs)
 
-def create(survey_id, campaign_id, *args, **kwargs):
-    """ Create new emailmessage object.
+    def get(self, survey_id, campaign_id, message_id, **kwargs):
+        """ Get email message by id.
 
-        Required params:
-        - survey_id:    survey ID
-        - campaign_id:  campaign ID
+            Required params:
+            - survey_id:    survey ID
+            - campaign_id:  campaign ID
+            - message_id:   message ID
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'campaign_id': campaign_id,
+            'message_id': message_id,
+        })
+        return super(EmailMessage, self).get(**kwargs)
 
-        Optional params:
-        - data:         refer to official documentation
-    """
-    tail = "survey/%s/surveycampaign/%s/emailmessage" % (survey_id, campaign_id)
-    params = {
-        '_method': 'PUT',
-    }
-    params.update(kwargs)
-    return tail, params
+    def create(self, survey_id, campaign_id, **kwargs):
+        """ Create new emailmessage object.
 
+            Required params:
+            - survey_id:    survey ID
+            - campaign_id:  campaign ID
 
-def delete(survey_id, campaign_id, message_id, *args, **kwargs):
-    """ Delete emailmessage object.
+            Optional params:
+            refer to official documentation
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'campaign_id': campaign_id,
+        })
+        return super(EmailMessage, self).create(**kwargs)
 
-        Required params:
-        - survey_id:    survey ID
-        - campaign_id:  campaign ID
-        - message_id:   message ID
-    """
-    tail = "survey/%s/surveycampaign/%s/emailmessage/%s" % (survey_id, campaign_id, message_id)
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
+    def update(self, survey_id, campaign_id, message_id, **kwargs):
+        """ Update existing emailmessage object.
 
+            Required params:
+            - survey_id:    survey ID
+            - campaign_id:  campaign ID
+            - message_id:   message ID
 
-def change(survey_id, campaign_id, message_id, *args, **kwargs):
-    """ Change existing emailmessage object.
+            Optional params:
+            refer to official documentation
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'campaign_id': campaign_id,
+            'message_id': message_id,
+        })
+        return super(EmailMessage, self).update(**kwargs)
 
-        Required params:
-        - survey_id:    survey ID
-        - campaign_id:  campaign ID
-        - message_id:   message ID
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-        Optional params:
-        - data:         refer to official documentation
-    """
-    tail = "survey/%s/surveycampaign/%s/emailmessage/%s" % (survey_id, campaign_id, message_id)
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, survey_id, campaign_id, message_id, **kwargs):
+        """ Delete emailmessage object.
+
+            Required params:
+            - survey_id:    survey ID
+            - campaign_id:  campaign ID
+            - message_id:   message ID
+        """
+        kwargs.update({
+            'survey_id': survey_id,
+            'campaign_id': campaign_id,
+            'message_id': message_id,
+        })
+        return super(EmailMessage, self).delete(**kwargs)

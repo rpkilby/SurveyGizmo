@@ -3,9 +3,8 @@ from surveygizmo.api import base
 
 
 class Survey(base.Resource):
-    resource_sub_str = 'survey/%(survey_id)s'
+    resource_fmt_str = 'survey/%(survey_id)s'
     resource_id_keys = ['survey_id']
-    copyable = True
 
     def list(self, **kwargs):
         """ Get list of all surveys.
@@ -93,7 +92,7 @@ class Survey(base.Resource):
         """ Delete survey object.
 
             Required params:
-            - survey_id: survey ID
+            - survey_id:    survey ID
         """
         kwargs.update({
             'survey_id': survey_id,
