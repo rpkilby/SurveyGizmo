@@ -1,90 +1,48 @@
 
-
-def list(survey_id, question_id, *args, **kwargs):
-    """ Get list of all options for a surveyquestion.
-
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    tail = "survey/%s/surveyquestion/%s/surveyoption" % (survey_id, question_id)
-    params = {
-
-    }
-    params.update(kwargs)
-    return tail, params
+from surveygizmo.api import base
 
 
-def get(survey_id, question_id, option_id, *args, **kwargs):
-    """ Get surveyoption by id.
+class SurveyOption(base.Resource):
+    resource_fmt_str = 'survey/%(survey_id)s/surveyquestion/%(question_id)s/surveyoption/%(option_id)s'
+    resource_id_keys = ['survey_id', 'quesiton_id']
 
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-        - option_id:    option ID
-    """
-    tail = "survey/%s/surveyquestion/%s/surveyoption/%s" % (survey_id, question_id, option_id)
-    params = {
+    def list(self, survey_id, question_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+        })
+        return super(SurveyOption, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, survey_id, question_id, option_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+            'option_id': option_id,
+        })
+        return super(SurveyOption, self).get(**kwargs)
 
+    def create(self, survey_id, question_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+        })
+        return super(SurveyOption, self).create(**kwargs)
 
-def create(survey_id, question_id, *args, **kwargs):
-    """ Create new surveyoption object.
+    def update(self, survey_id, question_id, option_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+            'option_id': option_id,
+        })
+        return super(SurveyOption, self).update(**kwargs)
 
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-        Optional params:
-        - title:        option title
-        - value:        option value
-    """
-    tail = "survey/%s/surveyquestion/%s/surveyoption" % (survey_id, question_id)
-    params = {
-        '_method': 'PUT',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def delete(survey_id, question_id, option_id, *args, **kwargs):
-    """ Delete surveyoption object.
-
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-        - option_id:    option ID
-    """
-    tail = "survey/%s/surveyquestion/%s/surveyoption/%s" % (survey_id, question_id, option_id)
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def update(survey_id, question_id, option_id, *args, **kwargs):
-    """ Update existing surveyoption object.
-
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-        - option_id:    option ID
-
-        Optional params:
-        - title:        option title
-        - value:        option value
-    """
-    tail = "survey/%s/surveyquestion/%s/surveyoption/%s" % (survey_id, question_id, option_id)
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, survey_id, question_id, option_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+            'option_id': option_id,
+        })
+        return super(SurveyOption, self).delete(**kwargs)

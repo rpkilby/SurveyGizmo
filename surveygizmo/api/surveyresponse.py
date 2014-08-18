@@ -1,80 +1,39 @@
 
-
-def list(survey_id, *args, **kwargs):
-    """ Get list of all responses for a survey.
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    tail = "survey/%s/surveyresponse" % survey_id
-    params = {
-
-    }
-    params.update(kwargs)
-    return tail, params
+from surveygizmo.api import base
 
 
-def get(survey_id, response_id, *args, **kwargs):
-    """ Get surveyresponse by id.
+class SurveyResponse(base.Resource):
+    resource_fmt_str = 'survey/%(survey_id)s/surveyresponse/%(response_id)s'
+    resource_id_keys = ['survey_id', 'response_id']
 
-        Required params:
-        - survey_id:    survey ID
-        - response_id:  response ID
-    """
-    tail = "survey/%s/surveyresponse/%s" % (survey_id, response_id)
-    params = {
+    def list(self, survey_id, **kwargs):
+        kwargs.update({'survey_id': survey_id, })
+        return super(SurveyResponse, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, survey_id, response_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'response_id': response_id,
+        })
+        return super(SurveyResponse, self).get(**kwargs)
 
+    def create(self, survey_id, **kwargs):
+        kwargs.update({'survey_id': survey_id, })
+        return super(SurveyResponse, self).create(**kwargs)
 
-def create(survey_id, *args, **kwargs):
-    """ Create new surveyresponse object.
+    def update(self, survey_id, response_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'response_id': response_id,
+        })
+        return super(SurveyResponse, self).update(**kwargs)
 
-        Required params:
-        - survey_id:    survey ID
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-        Optional params:
-        - data:         refer to official documentation
-    """
-    tail = "survey/%s/surveyresponse" % survey_id
-    params = {
-        '_method': 'PUT',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def delete(survey_id, response_id, *args, **kwargs):
-    """ Delete surveyresponse object.
-
-        Required params:
-        - survey_id: survey ID
-        - response_id:  response ID
-    """
-    tail = "survey/%s/surveyresponse/%s" % (survey_id, response_id)
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def update(survey_id, response_id, *args, **kwargs):
-    """ Update existing surveyresponse object.
-
-        Required params:
-        - survey_id:    survey ID
-        - response_id:  response ID
-
-        Optional params:
-        - data:         refer to official documentation
-    """
-    tail = "survey/%s/surveyresponse/%s" % (survey_id, response_id)
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, survey_id, response_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'response_id': response_id,
+        })
+        return super(SurveyResponse, self).delete(**kwargs)

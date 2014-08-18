@@ -1,101 +1,28 @@
 
-
-def list(*args, **kwargs):
-    """ Get list of all account users.
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    return "accountuser/", {}
+from surveygizmo.api import base
 
 
-def get(accountuser_id, *args, **kwargs):
-    """ Get account user by id.
+class AccountUser(base.Resource):
+    resource_fmt_str = 'accountuser/%(accountuser_id)s'
+    resource_id_keys = ['accountuser_id']
 
-        Required params:
-        - accountuser_id:    account user ID
-    """
-    tail = "accountuser/%s" % accountuser_id
-    params = {
+    def list(self, **kwargs):
+        return super(AccountUser, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, accountuser_id, **kwargs):
+        kwargs.update({'accountuser_id': accountuser_id, })
+        return super(AccountUser, self).get(**kwargs)
 
+    def create(self, **kwargs):
+        return super(AccountUser, self).create(**kwargs)
 
-def create(email, *args, **kwargs):
-    """ Create new accountuser object.
+    def update(self, accountuser_id, **kwargs):
+        kwargs.update({'accountuser_id': accountuser_id, })
+        return super(AccountUser, self).update(**kwargs)
 
-        Required params:
-        - email:                email address
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-        Optional params:
-        - username:             username
-        - password:             password
-        - team:                 team ID
-        - create_access_token:  only allowed when using oauth
-    """
-    tail = "accountuser/"
-    params = {
-        '_method': 'PUT',
-        'email': email,
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def update(accountuser_id, *args, **kwargs):
-    """ Update existing accountuser object.
-
-        Required params:
-        - accountuser_id:       accountuser ID
-
-        Optional params:
-        - email:                email address
-        - username:             username
-        - password:             password
-        - team:                 team ID
-    """
-    tail = "accountuser/%s" % accountuser_id
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def copy(accountuser_id, email, *args, **kwargs):
-    """ Copy new account user object from existing account user.
-
-        Required params:
-        - accountuser_id:       account user ID
-        - email:                email address
-
-        Optional params:
-        - username:             username
-        - password:             password
-        - team:                 team ID
-    """
-    tail = "accountuser/%s" % accountuser_id
-    params = {
-        '_method': 'POST',
-        'email': email,
-        'copy': 'true',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def delete(accountuser_id, *args, **kwargs):
-    """ Delete account user object.
-
-        Required params:
-        - accountuser_id:       accountuser ID
-    """
-    tail = "accountuser/%s" % accountuser_id
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, accountuser_id, **kwargs):
+        kwargs.update({'accountuser_id': accountuser_id, })
+        return super(AccountUser, self).delete(**kwargs)

@@ -1,92 +1,39 @@
 
-
-def list(survey_id, *args, **kwargs):
-    """ Get list of all questions for a survey.
-
-        Required params:
-        - survey_id:    survey ID
-
-        Optional params:
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    tail = "survey/%s/surveyquestion" % survey_id
-    params = {
-
-    }
-    params.update(kwargs)
-    return tail, params
+from surveygizmo.api import base
 
 
-def get(survey_id, question_id, *args, **kwargs):
-    """ Get surveyquestion by id.
+class SurveyQuestion(base.Resource):
+    resource_fmt_str = 'survey/%(survey_id)s/surveyquestion/%(question_id)s'
+    resource_id_keys = ['survey_id', 'question_id']
 
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-    """
-    tail = "survey/%s/surveyquestion/%s" % (survey_id, question_id)
-    params = {
+    def list(self, survey_id, **kwargs):
+        kwargs.update({'survey_id': survey_id, })
+        return super(SurveyQuestion, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, survey_id, question_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+        })
+        return super(SurveyQuestion, self).get(**kwargs)
 
+    def create(self, survey_id, **kwargs):
+        kwargs.update({'survey_id': survey_id, })
+        return super(SurveyQuestion, self).create(**kwargs)
 
-def create(survey_id, question_type, *args, **kwargs):
-    """ Create new surveyquestion object.
+    def update(self, survey_id, question_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+        })
+        return super(SurveyQuestion, self).update(**kwargs)
 
-        Required params:
-        - survey_id:        survey ID
-        - question_type:    select from [radio, text, email, checkbox, essay,
-                                contsum, rank-dragdrop, multitext, hidden,
-                                instructions, urlredirect, media, email, file,
-                                single-image, multi-image]
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-        Optional params:
-        - after:        which question to add after
-        - title:        question title
-        - description:  question description
-        - properties
-    """
-    tail = "survey/%s/surveyquestion" % survey_id
-    params = {
-        '_method': 'PUT',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def delete(survey_id, question_id, *args, **kwargs):
-    """ Delete surveyquestion object.
-
-        Required params:
-        - survey_id: survey ID
-        - question_id:  question ID
-    """
-    tail = "survey/%s/surveyquestion/%s" % (survey_id, question_id)
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def update(survey_id, question_id, *args, **kwargs):
-    """ Update existing surveyquestion object.
-
-        Required params:
-        - survey_id:    survey ID
-        - question_id:  question ID
-
-        Optional params:
-        - title:        question title
-        - description:  question description
-        - properties
-    """
-    tail = "survey/%s/surveyquestion/%s" % (survey_id, question_id)
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, survey_id, question_id, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'question_id': question_id,
+        })
+        return super(SurveyQuestion, self).delete(**kwargs)

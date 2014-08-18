@@ -1,97 +1,28 @@
 
-
-def list(*args, **kwargs):
-    """ Get list of all account teams.
-
-        Optional params:
-        - showdeleted:      include deleted accountteams
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    return "accountteams/", {}
+from surveygizmo.api import base
 
 
-def get(accountteams_id, *args, **kwargs):
-    """ Get account teams by id.
+class AccountTeams(base.Resource):
+    resource_fmt_str = 'accountteams/%(accountteams_id)s'
+    resource_id_keys = ['accountteams_id']
 
-        Required params:
-        - accountteams_id:    account teams ID
-    """
-    tail = "accountteams/%s" % accountteams_id
-    params = {
+    def list(self, **kwargs):
+        return super(AccountTeams, self).list(**kwargs)
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def get(self, accountteams_id, **kwargs):
+        kwargs.update({'accountteams_id': accountteams_id, })
+        return super(AccountTeams, self).get(**kwargs)
 
+    def create(self, **kwargs):
+        return super(AccountTeams, self).create(**kwargs)
 
-def create(*args, **kwargs):
-    """ Create new accountteams object.
+    def update(self, accountteams_id, **kwargs):
+        kwargs.update({'accountteams_id': accountteams_id, })
+        return super(AccountTeams, self).update(**kwargs)
 
-        Optional params:
-        - teamname:         team name
-        - description:      team description
-        - color:            team color #FF00FF
-        - defaultrole:      2 - 6 (ID of role)
-    """
-    tail = "accountteams/"
-    params = {
-        '_method': 'PUT',
-    }
-    params.update(kwargs)
-    return tail, params
+    def copy(self, **kwargs):
+        raise NotImplementedError()
 
-
-def update(accountteams_id, *args, **kwargs):
-    """ Update existing accountteams object.
-
-        Required params:
-        - accountteams_id:  accountteams ID
-
-        Optional params:
-        - teamname:         team name
-        - description:      team description
-        - color:            team color #FF00FF
-        - defaultrole:      2 - 6 (ID of role)
-    """
-    tail = "accountteams/%s" % accountteams_id
-    params = {
-        '_method': 'POST',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def copy(accountteams_id, *args, **kwargs):
-    """ Copy new account teams object from existing account teams.
-
-        Required params:
-        - accountteams_id:  account teams ID
-
-        Optional params:
-        - teamname:         team name
-        - description:      team description
-        - color:            team color #FF00FF
-        - defaultrole:      2 - 6 (ID of role)
-    """
-    tail = "accountteams/%s" % accountteams_id
-    params = {
-        '_method': 'POST',
-        'copy': 'true',
-    }
-    params.update(kwargs)
-    return tail, params
-
-
-def delete(accountteams_id, *args, **kwargs):
-    """ Delete account teams object.
-
-        Required params:
-        - accountteams_id:       accountteams ID
-    """
-    tail = "accountteams/%s" % accountteams_id
-    params = {
-        '_method': 'DELETE',
-    }
-    params.update(kwargs)
-    return tail, params
+    def delete(self, accountteams_id, **kwargs):
+        kwargs.update({'accountteams_id': accountteams_id, })
+        return super(AccountTeams, self).delete(**kwargs)

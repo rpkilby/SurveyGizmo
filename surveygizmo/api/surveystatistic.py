@@ -1,36 +1,26 @@
 
-
-def list(survey_id, *args, **kwargs):
-    """ Get list of all statistics for a survey.
-
-        Required params:
-        - survey_id:    survey ID
-
-        Optional params:
-        - surveypage:       restricts the statistics to specific page
-        - page:             page number
-        - resultsperpage:   number of results per page
-    """
-    tail = "survey/%s/surveystatistic" % survey_id
-    params = {
-
-    }
-    params.update(kwargs)
-    return tail, params
+from surveygizmo.api import base
 
 
-def get(survey_id, statistic_id, *args, **kwargs):
-    """ Get surveystatistic by id.
+class SurveyStatistic(base.Resource):
+    resource_fmt_str = 'survey/%(survey_id)s/surveystatistic/'
+    resource_id_keys = ['survey_id', 'statistic_id']
 
-        Note: Experimental in SG
+    def list(self, survey_id, **kwargs):
+        kwargs.update({'survey_id': survey_id, })
+        return super(SurveyStatistic, self).list(**kwargs)
 
-        Required params:
-        - survey_id:    survey ID
-        - statistic_id:  statistic ID
-    """
-    tail = "survey/%s/surveystatistic/%s" % (survey_id, statistic_id)
-    params = {
+    def get(self, **kwargs):
+        raise NotImplementedError()
 
-    }
-    params.update(kwargs)
-    return tail, params
+    def create(self, **kwargs):
+        raise NotImplementedError()
+
+    def update(self, **kwargs):
+        raise NotImplementedError()
+
+    def copy(self, **kwargs):
+        raise NotImplementedError()
+
+    def delete(self, **kwargs):
+        raise NotImplementedError()
