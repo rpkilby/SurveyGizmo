@@ -17,9 +17,15 @@ class SurveyQuestion(base.Resource):
         })
         return super(SurveyQuestion, self).get(**kwargs)
 
-    def create(self, survey_id, **kwargs):
-        kwargs.update({'survey_id': survey_id, })
-        return super(SurveyQuestion, self).create(**kwargs)
+    def create(self, survey_id, page_id, **kwargs):
+        # The API deviates a bit with question creation
+        path = 'survey/%(survey_id)s/surveypage/%(page_id)s/surveyquestion/' % locals()
+
+        kwargs.update({
+            '_method': 'PUT',
+        })
+
+        return self.api.call(path, kwargs)
 
     def update(self, survey_id, question_id, **kwargs):
         kwargs.update({

@@ -3,7 +3,7 @@ from surveygizmo.api import base
 
 
 class SurveyStatistic(base.Resource):
-    resource_fmt_str = 'survey/%(survey_id)s/surveystatistic/'
+    resource_fmt_str = 'survey/%(survey_id)s/surveystatistic/%(statistic_id)s'
     resource_id_keys = ['survey_id', 'statistic_id']
 
     def list(self, survey_id, **kwargs):
