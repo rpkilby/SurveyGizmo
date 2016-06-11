@@ -3,6 +3,9 @@
 
 A Python Wrapper for [SurveyGizmo](http://developer.surveygizmo.com/rest-api-documentation/)'s restful API service. Sort of - it's not really finished at the moment.
 
+[![Build Status](https://travis-ci.org/ITNG/SurveyGizmo.svg?branch=master)](https://travis-ci.org/ITNG/SurveyGizmo)
+[![codecov](https://codecov.io/gh/ITNG/SurveyGizmo/branch/master/graph/badge.svg)](https://codecov.io/gh/ITNG/SurveyGizmo)
+
 
 ## Installation
 
