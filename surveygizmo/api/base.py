@@ -1,20 +1,11 @@
 
-import hashlib
-
-import requests
-from surveygizmo import oauth_helper
-
-
 class Resource(object):
-    base_url = ''
     resource_fmt_str = ''
     resource_id_keys = []
 
-    def __init__(self, api, config):
+    def __init__(self, api):
         self._filters = []
         self.api = api
-        self.config = config
-        self.base_url = api.base_url
 
     def filter(self, field, operator, value):
         """ Add a query filter to be applied to the next API list call for this resource.
@@ -49,7 +40,7 @@ class Resource(object):
 
             Known Operators:
                 =           Is equal to (==)
-                <>          Is no eqal to (!=)
+                <>          Is equal to (!=)
                 IS NULL     Value is not answered or is blank
                 IS NOT NULL Value is answered or is not blank
                 in          Value is in comma separated list
@@ -86,105 +77,43 @@ class Resource(object):
 
     def list(self, **kwargs):
         kwargs.update(self.filters)
-        if not self.config.preserve_filters:
-            self.clear_filters()
-        return self._api_call(**kwargs)
+        self.clear_filters()
+        return self.api.call(*self.prepare(kwargs))
 
     def get(self, **kwargs):
-        return self._api_call(**kwargs)
+        return self.api.call(*self.prepare(kwargs))
 
     def create(self, **kwargs):
         kwargs.update({
             '_method': 'PUT',
         })
-        return self._api_call(**kwargs)
+        return self.api.call(*self.prepare(kwargs))
 
     def update(self, **kwargs):
         kwargs.update({
             '_method': 'POST',
         })
-        return self._api_call(**kwargs)
+        return self.api.call(*self.prepare(kwargs))
 
     def delete(self, **kwargs):
         kwargs.update({
             '_method': 'DELETE',
         })
-        return self._api_call(**kwargs)
+        return self.api.call(*self.prepare(kwargs))
 
     def copy(self, **kwargs):
         kwargs.update({
             '_method': 'POST',
             'copy': 'true',
         })
-        return self._api_call(**kwargs)
+        return self.api.call(*self.prepare(kwargs))
 
-    def _api_call(self, **kwargs):
-        self.config.validate()
-        url = self._prepare_url(kwargs)
-        params = self._prepare_params(kwargs)
-
-        if self.config.prepare_url:
-            return url, params
-        return self.execute(url, params)
-
-    def _prepare_url(self, kwargs):
-        # create/format the path of the url
+    def prepare(self, kwargs):
+        # format the path part of the url
         ids = {}
         for id_key in self.resource_id_keys:
             ids[id_key] = kwargs.pop(id_key, '')
 
         path = self.resource_fmt_str % ids
 
-        # API version and response format
-        if self.config.response_type:
-            path = "%s.%s" % (path, self.config.response_type)
-        path = "%s/%s" % (self.config.api_version, path)
-
-        # full url
-        return "%s%s" % (self.base_url, path)
-
-    def _prepare_params(self, kwargs):
-        config = self.config
-
-        if config.auth_method == 'user:pass':
-            kwargs.update({
-                config.auth_method: "%s:%s" % (config.username, config.password),
-            })
-
-        elif config.auth_method == 'user:md5':
-            if not config.md5_hash:
-                config.md5_hash = hashlib.md5(config.password).hexdigest()
-            kwargs.update({
-                config.auth_method: "%s:%s" % (config.username, config.md5_hash),
-            })
-
-        return kwargs
-
-    def execute(self, url, params):
-        """ Executes a call to the API.
-            :param url: The full url for the api call.
-            :param params: Query parameters encoded in the request.
-        """
-        config = self.config
-
-        if config.auth_method == 'oauth':
-            if not self.api._session:
-                self.api._session = oauth_helper.SGAuthService(
-                    config.consumer_key, config.consumer_secret,
-                    config.access_token, config.access_token_secret,
-                ).get_session()
-
-            response = self.api._session.get(url, params=params, **config.requests_kwargs)
-        else:
-            response = requests.get(url, params=params, **config.requests_kwargs)
-
-        if 520 <= response.status_code < 530:
-            if config.handler52x:
-                return config.handler52x(response, self, url, params)
-
-        response.raise_for_status()
-
-        if not config.response_type:
-            return response.json()
-        else:
-            return response.text
+        return path, kwargs

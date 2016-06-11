@@ -1,19 +1,23 @@
 
 import time
+import requests
 from api import base
 
 
 class ImproperlyConfigured(Exception):
-    """ SurveyGizmo is somehow improperly configured."""
+    """
+    SurveyGizmo is somehow improperly configured.
+    """
     pass
 
 
 def default_52xhandler(response, resource, url, params):
-    """ Default 52x handler that loops every second until a non 52x response is received.
-        :param response: The response of the last executed api request.
-        :param resource: The resource of the last executed api request.
-        :param url: The url of the last executed api request sans encoded query parameters.
-        :param params: The query params of the last executed api request in dictionary format.
+    """
+    Default 52x handler that loops every second until a non 52x response is received.
+    :param response: The response of the last executed api request.
+    :param resource: The resource of the last executed api request.
+    :param url: The url of the last executed api request sans encoded query parameters.
+    :param params: The query params of the last executed api request in dictionary format.
     """
     time.sleep(1)
     return resource.execute(url, params)
@@ -72,8 +76,9 @@ class API(object):
         self._import_api()
 
     def _import_api(self):
-        """ Instantiates API resources and adds them to the API instance. e.g., The
-            `surveygizmo.api.survey.Survey` resource is callable as `sg.api.survey`.
+        """
+        Instantiates API resources and adds them to the API instance. e.g., The
+        `surveygizmo.api.survey.Survey` resource is callable as `sg.api.survey`.
         """
         resources = __import__('api', globals(), locals(), ['*'])
 
@@ -81,18 +86,63 @@ class API(object):
             resource = getattr(resources, resource_name)
 
             if issubclass(resource, base.Resource):
-                self._resources[resource_name.lower()] = resource(self, self.config)
+                self._resources[resource_name.lower()] = resource(self)
 
     def __getattr__(self, name):
-        """ retrieve resources loaded from api
-        """
+        # necessary to retrieve resources loaded from api
         if self._resources.get(name, None) is not None:
             return self._resources[name]
         raise AttributeError(name)
 
+    def call(self, path, params):
+        self.config.validate()
+        url = self._prepare_url(path)
+        params = self._prepare_params(params)
+
+        if self.config.prepare_url:
+            return url, params
+        return self.execute(url, params)
+
+    def _prepare_url(self, path):
+
+        # API version and response format
+        if self.config.response_type:
+            path = "%s.%s" % (path, self.config.response_type)
+        path = "%s/%s" % (self.config.api_version, path)
+
+        # full url
+        return "%s%s" % (self.base_url, path)
+
+    def _prepare_params(self, params):
+        params.update({
+            'api_token': self.config.api_token,
+            'api_token_secret': self.config.api_token_secret,
+        })
+
+        return params
+
+    def execute(self, url, params):
+        """ Executes a call to the API.
+            :param url: The full url for the api call.
+            :param params: Query parameters encoded in the request.
+        """
+        response = requests.get(url, params=params, **self.config.requests_kwargs)
+
+        if 520 <= response.status_code < 530:
+            if self.config.handler52x:
+                return self.config.handler52x(response, self, url, params)
+
+        response.raise_for_status()
+
+        if not self.config.response_type:
+            return response.json()
+        else:
+            return response.text
+
 
 class SurveyGizmo(object):
-    """ SurveyGizmo API client.
+    """
+    SurveyGizmo API client.
     """
     def __init__(self, **kwargs):
         self.config = Config(**kwargs)
