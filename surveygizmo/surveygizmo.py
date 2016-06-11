@@ -26,14 +26,8 @@ def default_52xhandler(response, resource, url, params):
 class Config(object):
     def __init__(self, **kwargs):
         self.api_version = kwargs.get('api_version', 'head')
-        self.auth_method = kwargs.get('auth_method', None)
-        self.username = kwargs.get('username', None)
-        self.password = kwargs.get('password', None)
-        self.md5_hash = kwargs.get('md5_hash', None)
-        self.consumer_key = kwargs.get('consumer_key', None)
-        self.consumer_secret = kwargs.get('consumer_secret', None)
-        self.access_token = kwargs.get('access_token', None)
-        self.access_token_secret = kwargs.get('access_token_secret', None)
+        self.api_token = kwargs.get('api_token', None)
+        self.api_token_secret = kwargs.get('api_token_secret', None)
 
         self.response_type = kwargs.get('response_type', None)
         self.requests_kwargs = kwargs.get('requests_kwargs', {})
@@ -42,26 +36,14 @@ class Config(object):
         self.handler52x = kwargs.get('handler52x', None)
 
     def validate(self):
-        """ Perform validation check on properties.
         """
-        if not self.auth_method in ['user:pass', 'user:md5', 'oauth']:
-            raise ImproperlyConfigured("No authentication method provided.")
-        else:
-            if self.auth_method == "user:pass":
-                if not self.username or not self.password:
-                    raise ImproperlyConfigured("Username and password for 'user:pass' authentication.")
-            elif self.auth_method == "user:md5":
-                if not self.username:
-                    raise ImproperlyConfigured("Username required for 'user:md5' authentication.")
-                elif not self.password and not self.md5_hash:
-                    raise ImproperlyConfigured("Password or md5 hash of password required for 'user:md5' authentication.")
-            elif self.auth_method == "oauth":
-                if not self.consumer_key or not self.consumer_secret or \
-                   not self.access_token or not self.access_token_secret:
-                    raise ImproperlyConfigured("OAuth consumer key and secret, and OAuth access token and secret required for 'oauth' authentication.")
+        Perform validation check on properties.
+        """
+        if not self.api_token or not self.api_token_secret:
+            raise ImproperlyConfigured("'api_token' and 'api_token_secret' are required for authentication.")
 
-        if not self.response_type in ["json", "pson", "xml", "debug", None]:
-            raise ImproperlyConfigured()
+        if self.response_type not in ["json", "pson", "xml", "debug", None]:
+            raise ImproperlyConfigured("'%s' is an invalid response_type" % self.response_type)
 
 
 class API(object):
