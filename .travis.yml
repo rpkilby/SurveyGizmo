@@ -14,7 +14,7 @@ install:
   - travis_retry pip install .
 
 script:
-  - coverage run setup.py test -a "-v 2"
+  - coverage run setup.py test
   - coverage report
 
 after_success:
