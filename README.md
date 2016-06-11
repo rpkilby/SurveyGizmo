@@ -121,7 +121,13 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 * [api.surveystatistic](https://apihelp.surveygizmo.com/help/article/link/surveystatistic-sub-object)
 
 
-## 1.0.0 Changelog
+## Changelog
+
+### 1.1.0
+
+- Added required parameters various API calls (mostly create).
+
+### 1.0.0
 
 1.0.0 is a reimplementation of the entire API. Tests have been added and the package is basically stable.
 
@@ -131,7 +137,7 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 - Rename `add_filter` to just `filter`. Filters are chainable.
 
 
-## 0.2.0 Changelog
+### 0.2.0
 
 0.2.0 is a forwards incompatible release, but only minorly so.
 

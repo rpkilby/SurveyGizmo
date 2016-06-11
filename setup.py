@@ -21,7 +21,7 @@ def test_suite():
 
 setup(
     name='SurveyGizmo',
-    version='1.0.0.post1',
+    version='1.1.0',
     description='A Python Wrapper for SurveyGizmo\'s restful API service.',
     long_description=README,
     author='Ryan P Kilby',
