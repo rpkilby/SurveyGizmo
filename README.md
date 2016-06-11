@@ -7,9 +7,16 @@ A Python Wrapper for [SurveyGizmo](http://developer.surveygizmo.com/rest-api-doc
 [![codecov](https://codecov.io/gh/ITNG/SurveyGizmo/branch/master/graph/badge.svg)](https://codecov.io/gh/ITNG/SurveyGizmo)
 
 
+## Requirements
+
+- python 2.7, 3.3, 3.4, or 3.5
+
+
 ## Installation
 
-    $ pip install SurveyGizmo
+```sh
+$ pip install SurveyGizmo
+```
 
 
 ## Usage
