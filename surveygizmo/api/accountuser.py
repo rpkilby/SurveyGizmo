@@ -13,7 +13,10 @@ class AccountUser(base.Resource):
         kwargs.update({'accountuser_id': accountuser_id, })
         return super(AccountUser, self).get(**kwargs)
 
-    def create(self, **kwargs):
+    def create(self, email, **kwargs):
+        kwargs.update({
+            'email': email,
+        })
         return super(AccountUser, self).create(**kwargs)
 
     def update(self, accountuser_id, **kwargs):

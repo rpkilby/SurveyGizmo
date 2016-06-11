@@ -21,10 +21,12 @@ class SurveyOption(base.Resource):
         })
         return super(SurveyOption, self).get(**kwargs)
 
-    def create(self, survey_id, question_id, **kwargs):
+    def create(self, survey_id, question_id, title, value, **kwargs):
         kwargs.update({
             'survey_id': survey_id,
             'question_id': question_id,
+            'title': title,
+            'value': value,
         })
         return super(SurveyOption, self).create(**kwargs)
 

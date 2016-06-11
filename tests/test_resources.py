@@ -19,7 +19,7 @@ class ResourceTests(TestCase):
         path, params = client.api.survey.get(1)
         self.assertNotIn('_method', params)
 
-        path, params = client.api.survey.create()
+        path, params = client.api.survey.create('My Survey', 'poll')
         self.assertEqual(params['_method'], 'PUT')
 
         path, params = client.api.survey.update(1)
@@ -72,8 +72,9 @@ class AccountTeamsTests(TestCase):
         self.assertEqual(path, 'head/accountteams/1')
 
     def test_create(self):
-        path, params = self.resource.create()
+        path, params = self.resource.create('team')
         self.assertEqual(path, 'head/accountteams/')
+        self.assertEqual(params['teamname'], 'team')
 
     def test_update(self):
         path, params = self.resource.update(1)
@@ -100,8 +101,9 @@ class AccountUserTests(TestCase):
         self.assertEqual(path, 'head/accountuser/1')
 
     def test_create(self):
-        path, params = self.resource.create()
+        path, params = self.resource.create('user@example.com')
         self.assertEqual(path, 'head/accountuser/')
+        self.assertEqual(params['email'], 'user@example.com')
 
     def test_update(self):
         path, params = self.resource.update(1)
@@ -128,8 +130,9 @@ class ContactTests(TestCase):
         self.assertEqual(path, 'head/survey/1/surveycampaign/1/contact/1')
 
     def test_create(self):
-        path, params = self.resource.create(1, 1)
+        path, params = self.resource.create(1, 1, 'user@example.com')
         self.assertEqual(path, 'head/survey/1/surveycampaign/1/contact/')
+        self.assertEqual(params['semailaddress'], 'user@example.com')
 
     def test_update(self):
         path, params = self.resource.update(1, 1, 1)
@@ -156,12 +159,14 @@ class ContactListTests(TestCase):
         self.assertEqual(path, 'head/contactlist/1')
 
     def test_create(self):
-        path, params = self.resource.create()
+        path, params = self.resource.create('Contact List')
         self.assertEqual(path, 'head/contactlist/')
+        self.assertEqual(params['listname'], 'Contact List')
 
     def test_update(self):
-        path, params = self.resource.update(1)
+        path, params = self.resource.update(1, 'user@example.com')
         self.assertEqual(path, 'head/contactlist/1')
+        self.assertEqual(params['semailaddress'], 'user@example.com')
 
     def test_copy(self):
         with self.assertRaises(NotImplementedError):
@@ -212,8 +217,10 @@ class SurveyTests(TestCase):
         self.assertEqual(path, 'head/survey/1')
 
     def test_create(self):
-        path, params = self.resource.create()
+        path, params = self.resource.create('My Survey', 'poll')
         self.assertEqual(path, 'head/survey/')
+        self.assertEqual(params['title'], 'My Survey')
+        self.assertEqual(params['type'], 'poll')
 
     def test_update(self):
         path, params = self.resource.update(1)
@@ -240,8 +247,10 @@ class SurveyCampaignTests(TestCase):
         self.assertEqual(path, 'head/survey/1/surveycampaign/1')
 
     def test_create(self):
-        path, params = self.resource.create(1)
+        path, params = self.resource.create(1, 'My Campaign', 'email')
         self.assertEqual(path, 'head/survey/1/surveycampaign/')
+        self.assertEqual(params['name'], 'My Campaign')
+        self.assertEqual(params['type'], 'email')
 
     def test_update(self):
         path, params = self.resource.update(1, 1)
@@ -268,8 +277,10 @@ class SurveyOptionTests(TestCase):
         self.assertEqual(path, 'head/survey/1/surveyquestion/1/surveyoption/1')
 
     def test_create(self):
-        path, params = self.resource.create(1, 1)
+        path, params = self.resource.create(1, 1, 'Option', 'Value')
         self.assertEqual(path, 'head/survey/1/surveyquestion/1/surveyoption/')
+        self.assertEqual(params['title'], 'Option')
+        self.assertEqual(params['value'], 'Value')
 
     def test_update(self):
         path, params = self.resource.update(1, 1, 1)
@@ -296,8 +307,9 @@ class SurveyPageTests(TestCase):
         self.assertEqual(path, 'head/survey/1/surveypage/1')
 
     def test_create(self):
-        path, params = self.resource.create(1)
+        path, params = self.resource.create(1, 'Page 1')
         self.assertEqual(path, 'head/survey/1/surveypage/')
+        self.assertEqual(params['title'], 'Page 1')
 
     def test_update(self):
         path, params = self.resource.update(1, 1)
@@ -358,10 +370,12 @@ class SurveyReportTests(TestCase):
     def test_update(self):
         path, params = self.resource.update(1, 1)
         self.assertEqual(path, 'head/survey/1/surveyreport/1')
+        self.assertEqual(params['copy'], 'false')
 
     def test_copy(self):
         path, params = self.resource.copy(1, 1)
         self.assertEqual(path, 'head/survey/1/surveyreport/1')
+        self.assertEqual(params['copy'], 'true')
 
     def test_delete(self):
         path, params = self.resource.delete(1, 1)

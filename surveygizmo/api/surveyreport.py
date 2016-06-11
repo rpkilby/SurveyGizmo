@@ -24,6 +24,9 @@ class SurveyReport(base.Resource):
         kwargs.update({
             'survey_id': survey_id,
             'report_id': report_id,
+
+            # copy is required, even if false?
+            'copy': 'false',
         })
         return super(SurveyReport, self).update(**kwargs)
 

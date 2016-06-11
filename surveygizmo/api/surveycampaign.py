@@ -17,8 +17,12 @@ class SurveyCampaign(base.Resource):
         })
         return super(SurveyCampaign, self).get(**kwargs)
 
-    def create(self, survey_id, **kwargs):
-        kwargs.update({'survey_id': survey_id, })
+    def create(self, survey_id, name, type, **kwargs):
+        kwargs.update({
+            'survey_id': survey_id,
+            'name': name,
+            'type': type,
+        })
         return super(SurveyCampaign, self).create(**kwargs)
 
     def update(self, survey_id, campaign_id, **kwargs):

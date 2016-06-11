@@ -13,11 +13,17 @@ class ContactList(base.Resource):
         kwargs.update({'contactlist_id': contactlist_id, })
         return super(ContactList, self).get(**kwargs)
 
-    def create(self, **kwargs):
+    def create(self, listname, **kwargs):
+        kwargs.update({
+            'listname': listname,
+        })
         return super(ContactList, self).create(**kwargs)
 
-    def update(self, contactlist_id, **kwargs):
-        kwargs.update({'contactlist_id': contactlist_id, })
+    def update(self, contactlist_id, semailaddress, **kwargs):
+        kwargs.update({
+            'contactlist_id': contactlist_id,
+            'semailaddress': semailaddress,
+        })
         return super(ContactList, self).update(**kwargs)
 
     def copy(self, **kwargs):

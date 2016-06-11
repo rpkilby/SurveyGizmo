@@ -13,7 +13,11 @@ class Survey(base.Resource):
         kwargs.update({'survey_id': survey_id, })
         return super(Survey, self).get(**kwargs)
 
-    def create(self, **kwargs):
+    def create(self, title, type, **kwargs):
+        kwargs.update({
+            'title': title,
+            'type': type,
+        })
         return super(Survey, self).create(**kwargs)
 
     def update(self, survey_id, **kwargs):
@@ -21,7 +25,9 @@ class Survey(base.Resource):
         return super(Survey, self).update(**kwargs)
 
     def copy(self, survey_id, **kwargs):
-        kwargs.update({'survey_id': survey_id, })
+        kwargs.update({
+            'survey_id': survey_id,
+        })
         return super(Survey, self).copy(**kwargs)
 
     def delete(self, survey_id, **kwargs):

@@ -13,7 +13,10 @@ class AccountTeams(base.Resource):
         kwargs.update({'accountteams_id': accountteams_id, })
         return super(AccountTeams, self).get(**kwargs)
 
-    def create(self, **kwargs):
+    def create(self, teamname, **kwargs):
+        kwargs.update({
+            'teamname': teamname,
+        })
         return super(AccountTeams, self).create(**kwargs)
 
     def update(self, accountteams_id, **kwargs):

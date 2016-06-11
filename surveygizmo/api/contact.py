@@ -21,10 +21,11 @@ class Contact(base.Resource):
         })
         return super(Contact, self).get(**kwargs)
 
-    def create(self, survey_id, campaign_id, **kwargs):
+    def create(self, survey_id, campaign_id, semailaddress, **kwargs):
         kwargs.update({
             'survey_id': survey_id,
             'campaign_id': campaign_id,
+            'semailaddress': semailaddress,
         })
         return super(Contact, self).create(**kwargs)
 
