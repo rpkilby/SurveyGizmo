@@ -4,7 +4,7 @@ from surveygizmo.api import base
 
 class SurveyOption(base.Resource):
     resource_fmt_str = 'survey/%(survey_id)s/surveyquestion/%(question_id)s/surveyoption/%(option_id)s'
-    resource_id_keys = ['survey_id', 'quesiton_id']
+    resource_id_keys = ['survey_id', 'question_id', 'option_id']
 
     def list(self, survey_id, question_id, **kwargs):
         kwargs.update({
