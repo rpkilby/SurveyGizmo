@@ -1,0 +1,28 @@
+language: python
+
+sudo: false
+
+python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+
+install:
+  - travis_retry pip install coverage
+  - travis_retry pip install .
+
+script:
+  - coverage run setup.py test -a "-v 2"
+  - coverage report
+
+after_success:
+  - pip install codecov
+  - codecov
+
+notifications:
+  email: false
+
+matrix:
+  fast_finish: true
