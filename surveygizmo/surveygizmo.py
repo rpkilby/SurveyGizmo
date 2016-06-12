@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import time
 import requests
 from .api import base
+from .compat import with_metaclass
 
 
 class ImproperlyConfigured(Exception):
@@ -48,35 +49,34 @@ class Config(object):
             raise ImproperlyConfigured("'%s' is an invalid response_type" % self.response_type)
 
 
-class API(object):
-    base_url = "https://restapi.surveygizmo.com/"
+class APIMeta(type):
+    def __init__(cls, name, bases, attrs):
+        super(APIMeta, cls).__init__(name, bases, attrs)
 
-    def __init__(self, config):
-        self.config = config
-
-        self._resources = {}
-        self._session = None
-
-        self._import_api()
-
-    def _import_api(self):
-        """
-        Instantiates API resources and adds them to the API instance. e.g., The
-        `surveygizmo.api.survey.Survey` resource is callable as `sg.api.survey`.
-        """
         resources = __import__('api', globals(), locals(), [], 1)
 
         for resource_name in resources.__all__:
             resource = getattr(resources, resource_name)
-
             if issubclass(resource, base.Resource):
-                self._resources[resource_name.lower()] = resource(self)
 
-    def __getattr__(self, name):
-        # necessary to retrieve resources loaded from api
-        if self._resources.get(name, None) is not None:
-            return self._resources[name]
-        raise AttributeError(name)
+                setattr(cls, resource_name.lower(), cls.prop(resource))
+
+    def prop(self, resource):
+        """
+        Generate properties for accessing resources.
+        """
+        @property
+        def wrapped(self):
+            return resource(self)
+
+        return wrapped
+
+
+class API(with_metaclass(APIMeta, object)):
+    base_url = "https://restapi.surveygizmo.com/"
+
+    def __init__(self, config):
+        self.config = config
 
     def call(self, path, params):
         self.config.validate()
