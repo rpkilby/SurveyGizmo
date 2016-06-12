@@ -161,5 +161,5 @@ Backwards incompatible changes:
 
 
 ## Copyright & License
-Copyright &copy; 2013-2014 NC State University. See LICENSE for details.
+Copyright &copy; 2013-2016 NC State University. See LICENSE for details.
 
