@@ -70,8 +70,8 @@ The filtering implementation contains no real magic and is simply a convenience 
 To filter, simply
 
 ```python
-client.api.surveyresponse.filter('datesubmitted', '<=', '2013-07-01')
-client.api.surveyresponse.list('39501')
+filtered = client.api.surveyresponse.filter('datesubmitted', '<=', '2013-07-01')
+filtered.list('39501')
 ```
 
 Filtering is also chainable.
@@ -82,8 +82,8 @@ client.api.survey.filter('createdon', '<=', '2013-04-01').list()
 
 client.api.surveyresponse \
     .filter('datesubmitted', '<=', '2013-07-01') \
-    .filter('datesubmitted', '>', '2013-06-01')
-client.api.surveyresponse.list('39501')
+    .filter('datesubmitted', '>', '2013-06-01') \
+    .list('39501')
 ```
 
 
@@ -122,6 +122,11 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 
 
 ## Changelog
+
+### 1.2.0
+
+- Reimplmented API import as metaclass.
+- Reimplemented filtering, removed race condition.
 
 ### 1.1.0
 

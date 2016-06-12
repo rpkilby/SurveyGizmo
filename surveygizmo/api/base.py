@@ -1,4 +1,7 @@
 
+from copy import copy
+
+
 class Resource(object):
     resource_fmt_str = ''
     resource_id_keys = []
@@ -54,21 +57,27 @@ class Resource(object):
                 >
                 <
         """
-        i = len(self._filters)
-        self._filters.append({
+        instance = copy(self)
+
+        i = len(instance._filters)
+        instance._filters.append({
             'filter[field][%d]' % i: str(field),
             'filter[operator][%d]' % i: str(operator),
             'filter[value][%d]' % i: str(value),
         })
-        return self
+        return instance
 
-    def clear_filters(self):
-        """ Clear API filters added through `filter`.
-        """
-        self._filters = []
+    def __copy__(self):
+        instance = self.__class__(self.api)
+        instance._filters = copy(self._filters)
+
+        return instance
 
     @property
     def filters(self):
+        """
+        Returns a merged dictionary of filters.
+        """
         params = {}
         for _filter in self._filters:
             params.update(_filter)
@@ -77,7 +86,6 @@ class Resource(object):
 
     def list(self, **kwargs):
         kwargs.update(self.filters)
-        self.clear_filters()
         return self.api.call(*self.prepare(kwargs))
 
     def get(self, **kwargs):

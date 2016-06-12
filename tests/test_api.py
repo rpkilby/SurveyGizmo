@@ -6,32 +6,6 @@ client = SurveyGizmo(api_token='token', api_token_secret='secret', prepare_url=T
 client.api.base_url = ''
 
 
-class ResourceTests(TestCase):
-    def test_authentication(self):
-        path, params = client.api.survey.get(1)
-        self.assertEqual(params['api_token'], 'token')
-        self.assertEqual(params['api_token_secret'], 'secret')
-
-    def test_methods(self):
-        path, params = client.api.survey.list()
-        self.assertNotIn('_method', params)
-
-        path, params = client.api.survey.get(1)
-        self.assertNotIn('_method', params)
-
-        path, params = client.api.survey.create('My Survey', 'poll')
-        self.assertEqual(params['_method'], 'PUT')
-
-        path, params = client.api.survey.update(1)
-        self.assertEqual(params['_method'], 'POST')
-
-        path, params = client.api.survey.copy(1)
-        self.assertEqual(params['_method'], 'POST')
-
-        path, params = client.api.survey.delete(1)
-        self.assertEqual(params['_method'], 'DELETE')
-
-
 class AccountTests(TestCase):
     resource = client.api.account
 
