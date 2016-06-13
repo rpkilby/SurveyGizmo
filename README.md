@@ -123,6 +123,10 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 
 ## Changelog
 
+### 1.2.1
+
+- Added `_prepare_url` argument to API calls that overrides the configured setting for `prepare_url`.
+
 ### 1.2.0
 
 - Reimplmented API import as metaclass.
@@ -150,7 +154,7 @@ Forwards incompatible changes:
 
 - Renamed the 'change' operations to 'update'. This is consistent with SurveyGizmo's API naming.
 - Removed the 'keep' kwarg for preserving filters bettween api funcion calls. This is now configured with 'preserve_filters'. Filters are now cleared manually with `api.clear_filters()`
-- Removed the undocumented 'url_fetch' kwarg, which prevented api executioned and instead returned the prepared url.
+- Removed the undocumented 'url_fetch' kwarg, which prevented api execution and instead returned the prepared url.
 
 Backwards incompatible changes:
 

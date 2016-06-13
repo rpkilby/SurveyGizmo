@@ -35,7 +35,6 @@ class Config(object):
         self.response_type = kwargs.get('response_type', None)
         self.requests_kwargs = kwargs.get('requests_kwargs', {})
         self.prepare_url = kwargs.get('prepare_url', False)
-        self.preserve_filters = kwargs.get('preserve_filters', False)
         self.handler52x = kwargs.get('handler52x', None)
 
     def validate(self):
@@ -83,7 +82,7 @@ class API(with_metaclass(APIMeta, object)):
         url = self._prepare_url(path)
         params = self._prepare_params(params)
 
-        if self.config.prepare_url:
+        if params.pop('_prepare_url', self.config.prepare_url):
             return url, params
         return self.execute(url, params)
 

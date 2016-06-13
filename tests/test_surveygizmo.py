@@ -32,3 +32,18 @@ class APIMetaTests(TestCase):
         # new invocations should return new Resources. This is necessary
         # so that filtering is not global.
         self.assertIsNot(client.api.survey, client.api.survey)
+
+
+class APITests(TestCase):
+    def test_prepare_url_config(self):
+        self.assertTrue(client.config.prepare_url)
+
+        _, params = client.api.survey.list()
+        self.assertNotIn('_prepare_url', params)
+
+    def test_prepare_url_override(self):
+        client = SurveyGizmo(api_token='token', api_token_secret='secret', prepare_url=False)
+        client.api.base_url = ''
+
+        _, params = client.api.survey.list(_prepare_url=True)
+        self.assertNotIn('_prepare_url', params)
