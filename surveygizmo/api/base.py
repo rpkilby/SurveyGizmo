@@ -83,6 +83,22 @@ class Resource(object):
         })
         return instance
 
+    def page(self, value):
+        """ Set the page which will be returned. 
+            :param value: 'page' parameter value for the rest api call
+            :type value: str
+
+            Take a look at https://apihelp.surveygizmo.com/help/surveyresponse-sub-object
+
+        """
+
+        instance = copy(self)
+
+        instance._filters.append({
+            'page': value
+        })
+        return instance
+
     def __copy__(self):
         instance = self.__class__(self.api)
         instance._filters = copy(self._filters)
