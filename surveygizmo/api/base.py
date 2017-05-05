@@ -67,6 +67,22 @@ class Resource(object):
         })
         return instance
 
+    def resultsperpage(self, value):
+        """ Set the number of results that will be retrieved by the request. 
+            :param value: 'resultsperpage' parameter value for the rest api call
+            :type value: str
+
+            Take a look at https://apihelp.surveygizmo.com/help/surveyresponse-sub-object
+
+        """
+
+        instance = copy(self)
+
+        instance._filters.append({
+            'resultsperpage': value
+        })
+        return instance
+
     def __copy__(self):
         instance = self.__class__(self.api)
         instance._filters = copy(self._filters)
