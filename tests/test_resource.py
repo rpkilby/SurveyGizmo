@@ -81,3 +81,10 @@ class FilteringTests(TestCase):
         self.assertNotIn('filter[field][0]', params)
         self.assertNotIn('filter[operator][0]', params)
         self.assertNotIn('filter[value][0]', params)
+
+    def test_pagination(self):
+        _, params = client.api.surveyresponse.resultsperpage('3').list(1)
+        self.assertEqual(params['resultsperpage'], '3')
+
+        _, params = client.api.surveyresponse.page('5').list(1)
+        self.assertEqual(params['page'], '5')
