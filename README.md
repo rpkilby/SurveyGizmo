@@ -123,6 +123,10 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 
 ## Changelog
 
+### 1.2.2
+
+- #17 Added basic pagination support. Thanks @WesleyBatista!
+
 ### 1.2.1
 
 - Added `_prepare_url` argument to API calls that overrides the configured setting for `prepare_url`.
