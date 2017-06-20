@@ -9,7 +9,7 @@ A Python Wrapper for [SurveyGizmo](https://apihelp.surveygizmo.com/help)'s mostl
 
 ## Requirements
 
-- python 2.7, 3.3, 3.4, or 3.5
+- **python**: 2.7, 3.4, 3.5, 3.6
 
 
 ## Installation
