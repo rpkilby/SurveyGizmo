@@ -123,6 +123,11 @@ After SurveyGizmo's move to CloudFlare, it isn't uncommon to see connectivity is
 
 ## Changelog
 
+### 1.2.3
+
+- #21 Make the 'base_url' configurable.
+- Drop explicit python 3.3 support.
+
 ### 1.2.2
 
 - #17 Added basic pagination support. Thanks @WesleyBatista!
@@ -166,6 +171,18 @@ Backwards incompatible changes:
 - Added 'prepare_url' as a replacement for 'url_fetch'. This forces the client to return the url after being prepared instead of executing the api call. This is useful in cases where you need to call the api asynchronously.
 - Added 'requests_kwargs'. These are additional arguments passed to `requests.get`. Useful for setting timeouts and otherwise configuring the requests library.
 - Added handling for CloudFlare 52x errors
+
+
+## Release Process
+
+- Update package version in `setup.py`
+- Create git tag for version
+- Upload release to PyPI
+    ```bash
+    $ pip install -U setuptools wheel
+    $ rm -rf dist/ build/
+    $ python setup.py sdist bdist_wheel upload
+    ```
 
 
 ## Copyright & License
