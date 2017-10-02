@@ -28,6 +28,7 @@ def default_52xhandler(response, resource, url, params):
 
 class Config(object):
     def __init__(self, **kwargs):
+        self.base_url = kwargs.get('base_url', 'https://restapi.surveygizmo.com/')
         self.api_version = kwargs.get('api_version', 'head')
         self.api_token = kwargs.get('api_token', None)
         self.api_token_secret = kwargs.get('api_token_secret', None)
@@ -72,8 +73,6 @@ class APIMeta(type):
 
 
 class API(with_metaclass(APIMeta, object)):
-    base_url = "https://restapi.surveygizmo.com/"
-
     def __init__(self, config):
         self.config = config
 
@@ -94,7 +93,7 @@ class API(with_metaclass(APIMeta, object)):
         path = "%s/%s" % (self.config.api_version, path)
 
         # full url
-        return "%s%s" % (self.base_url, path)
+        return "%s%s" % (self.config.base_url, path)
 
     def _prepare_params(self, params):
         params.update({

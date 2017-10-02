@@ -2,8 +2,12 @@
 from unittest import TestCase
 from surveygizmo import SurveyGizmo
 
-client = SurveyGizmo(api_token='token', api_token_secret='secret', prepare_url=True)
-client.api.base_url = ''
+client = SurveyGizmo(
+    base_url='',
+    api_token='token',
+    api_token_secret='secret',
+    prepare_url=True,
+)
 
 
 class AccountTests(TestCase):
