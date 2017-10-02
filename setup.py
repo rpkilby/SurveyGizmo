@@ -32,7 +32,7 @@ setup(
     install_requires=['requests'],
     test_suite='setup.test_suite',
     license='BSD License',
-    classifiers=(
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -47,5 +47,5 @@ setup(
         'Operating System :: OS Independent',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Software Development :: Libraries :: Python Modules',
-    ),
+    ],
 )
