@@ -27,7 +27,7 @@ Start by instantiating the SurveyGizmo object and providing some configuration p
 from surveygizmo import SurveyGizmo
 
 client = SurveyGizmo(
-    api_version='v4'
+    api_version='v5'
 
     # example token from SurveyGizmo docs
     api_token = "E4F796932C2743FEBF150B421BE15EB9"
@@ -39,13 +39,40 @@ client.config.api_token = "E4F796932C2743FEBF150B421BE15EB9"
 client.config.api_token_secret = "A9fGMkJ5pJF1k"
 ```
 
-Calls to the api are by object type then by function. For example,
+Calls to the API are by object type, then by function. For example,
 
 ```python
 client.api.survey.list()
 client.api.survey.get('39501')
 client.api.survey.copy('39501', 'New title boop')
 client.api.surveyresponse.list('39501')
+```
+
+Most API calls have required parameters, which are similarly required by the function signatures.
+
+```python
+>>> client.api.survey.create('Survey Title')
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: create() missing 1 required positional argument: 'type'
+```
+
+Optional parameters may be provided as keyword arguments, although not all parameters are valid python identifiers.
+
+```python
+client.api.survey.create('Survey Title 1', 'survey', team='456789')
+```
+
+```python
+>>> client.api.emailmessage.create('123456', '100000', body[html]='...')
+  File "<stdin>", line 1
+SyntaxError: keyword can't be an expression
+```
+
+Instead, these arguments may be passed as a kwargs dictionary.
+
+```python
+client.api.emailmessage.create('123456', '100000', **{'body[html]': '...'})
 ```
 
 Most resources have the list, get, create, update, copy, and delete actions. If SurveyGizmo's REST API does not implement an action, the client will raise a `NotImplementedError`.
@@ -89,7 +116,7 @@ client.api.surveyresponse \
 
 ## Config paramaters
 
-* **api_version** - 'v3', 'v4', 'head'. Defaults to 'head'
+* **api_version** - 'v4', 'v5', 'head'. Defaults to 'head'
 * **api_token**
 * **api_token_secret**
 * **response_type** - `None`, `'json'`, `'pson'`, `'xml'`, `'debug'`. By default (using `None`), the API returns a JSON response which is parsed by the client into a python dictionary. Specifying a `response_type` will return an unparsed body of the specified format.
@@ -186,5 +213,4 @@ Backwards incompatible changes:
 
 
 ## Copyright & License
-Copyright &copy; 2013-2016 NC State University. See LICENSE for details.
-
+Copyright &copy; 2013-2018 NC State University. See LICENSE for details.
